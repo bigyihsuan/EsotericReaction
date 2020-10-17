@@ -1,0 +1,4 @@
+<expr>  = '(' <expr> ')' | <mole>* | <atom>
+<mole>  = <atom> <num> | '(' <mole> ')' <num>
+<atom>  = 'H' | 'He' | ... | 'Ts' | 'Og' // All elements here
+<num>   = // number not starting with 0
