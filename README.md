@@ -2,38 +2,49 @@
 
 An esolang using chemical "formulas" as code. The name is a pun on "exothermic reaction".
 
-A single atomic element (C, O, U, Fe, etc) represents an operation. A numbered element (`H_2`, `H_2O`, `C0_2`) represents a different operation, based on its preceeding element. A numbered molecule (`3H`,`3H_2O`, etc) represents that molecule operating that number of times.
-
 Yes, imbalanced and impossible equations are possible.
 
-```
-reagents [eq] products
-A + B -> C + heat
-```
-
-Each line of equations applies the operation in the direction of the arrow. Whatever value is on 
-
-`A + B` represents the two input arguments `A` and `B`.
-
-`[eq]` can be one of four symobls:
-
-* `=` for assignment and definition
-* `->` for one-way equation
-* `<->` for two-way equation
-* `<=>` for equillibrium equation
-
-Parentheses signifies multi-element names. `A(BC)` is `A` and `BC`.
-
 Comments are signified by a semicolon `; Comment`.
-
-Heat and light are "side" effects. Light is the function IO. As a reagent it is a list consisting of the function arguments. As a product, it is a list containing all output values.
-Heat represents STDIO. As a reagent, it is a list of characters of a single line of STDIN. As a
 
 ## Types
 
 Integer: bog-standard 64-bit signed integer.
-* Floating point numbers are represented by taking their IEEE 754 double-precision binary representation and interpreting it as an integer.
+* Floating point numbers are represented by taking their IEEE 754 double-precision (64-bits long) binary representation and interpreting it as an integer.
 
 List: an infinitely-nestable heterogenous list that can hold values.
 * Lists consisting of solely integer values can be considered as Strings. Each integer represents a character's value in UTF-8.
 
+## Elements
+
+Each of the 118 elements of the periodic table represents a different function/instruction.
+
+Coefficients indicate that element being repeated several times. So `2O == O + O`.
+
+Subscripts change the number of arguments expected for the function. So `Li_3` expects 3 arguments following it.
+
+Strings of consecutive elements (`H_20`, `NLi_4`, etc) represents function composition from right to left. So, `ABC` is `C(B(A()))`.
+
+### Light and Heat
+`light` and `heat` are special elements. `light` handles STDIO, and `heat` handles the equation pointer.
+
+`light` on the reagent side returns a single line of STDIN. On the product side, `light` prints the result of the reagents to STDOUT.
+
+`heat` as an reagent returns the value of the equation pointer, i.e. the line of code that is currently executing. As a product the result of the reagents gets stored in `heat`.
+
+## Equations
+Equations are always of the following form:
+```
+<equation> = <term> <eq> <term>
+<eq> = '=' | '->'
+<term> = '(' <molecule> ')' | <molecule> '+' <term>
+<molecule> = <num> <atoms> | <atoms>
+<atoms> = <element> | <element> '_' <num>
+```
+Equations are chemicals separated by an equation symbol.
+
+The equation symbol can be one of the following two symbols:
+* `=`: Bind a name (product) to functions (reagents)
+* `->`: The result of the reagents is stored in the memory location indexed by the result of the product.
+* * If the product results in a list, the result of the reagents is stored in each location indexed by each element of the list.
+
+Chemicals 
