@@ -27,4 +27,13 @@ Parentheses signifies multi-element names. `A(BC)` is `A` and `BC`.
 Comments are signified by a semicolon `; Comment`.
 
 Heat and light are "side" effects. Light is the function IO. As a reagent it is a list consisting of the function arguments. As a product, it is a list containing all output values.
-Heat represents STDIO. As a reagent, it is a list of characters of a single line of STDIN. As a 
+Heat represents STDIO. As a reagent, it is a list of characters of a single line of STDIN. As a
+
+## Types
+
+Integer: bog-standard 64-bit signed integer.
+* Floating point numbers are represented by taking their IEEE 754 double-precision binary representation and interpreting it as an integer.
+
+List: an infinitely-nestable heterogenous list that can hold values.
+* Lists consisting of solely integer values can be considered as Strings. Each integer represents a character's value in UTF-8.
+
