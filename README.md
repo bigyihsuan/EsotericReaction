@@ -1,4 +1,4 @@
-# Atomic
+# Esoteric Formula
 
 An esolang using chemical "formulas" as code. Functional stack-based language, aka instructions can be data and be pushed onto the stack.
 
