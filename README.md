@@ -1,6 +1,6 @@
-# Esoteric Formula
+# Esoteric Reaction
 
-An esolang using chemical "formulas" as code. Functional stack-based language, aka instructions can be data and be pushed onto the stack.
+An esolang using chemical "formulas" as code. The name is a pun on "exothermic reaction".
 
 A single atomic element (C, O, U, Fe, etc) represents an operation. A numbered element (`H_2`, `H_2O`, `C0_2`) represents a different operation, based on its preceeding element. A numbered molecule (`3H`,`3H_2O`, etc) represents that molecule operating that number of times.
 
