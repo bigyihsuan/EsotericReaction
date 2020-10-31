@@ -4,8 +4,6 @@ An esolang using chemical "formulas" as code. The name is a pun on "exothermic r
 
 Yes, imbalanced and impossible equations are possible.
 
-Comments are signified by a semicolon `; Comment`.
-
 ## Types
 
 Integer: bog-standard 64-bit signed integer.
@@ -32,14 +30,21 @@ Strings of consecutive elements (`H_20`, `NLi_4`, etc) represents function compo
 `heat` as an reagent returns the value of the equation pointer, i.e. the line of code that is currently executing. As a product the result of the reagents gets stored in `heat`.
 
 ## Equations
-Equations are always of the following form:
+Equations are always of the following grammar:
 ```
-<equation> = <term> <eq> <term>
-<eq> = '=' | '->'
-<term> = '(' <molecule> ')' | <molecule> '+' <term>
-<molecule> = <num> <atoms> | <atoms>
-<atoms> = <element> | <element> '_' <num>
+<equation> = <term> <eq>
+<eq> = '=' <name> | '->' <term>
+<name> = [a-z][a-z0-9]*, not `light` or `heat`
+<term> = <molecule> '+' <term> | <molecule>
+<molecule> = <num> <submolecule> | <atomGroup>
+<atomGroup> = '(' <submolecule> ')'
+<submolecule> = <atom><atom> | <atom> | 'light' | 'heat'
+<atom> = <element> | <element> '_' <num>
+<num> = [2-9] | [1-9][0-9]*
+<element> = any element on the periodic table
 ```
+Comments are signified by a semicolon `; comment up to the end of the line`.
+
 Equations are chemicals separated by an equation symbol.
 
 The equation symbol can be one of the following two symbols:
@@ -47,4 +52,4 @@ The equation symbol can be one of the following two symbols:
 * `->`: The result of the reagents is stored in the memory location indexed by the result of the product.
 * * If the product results in a list, the result of the reagents is stored in each location indexed by each element of the list.
 
-Chemicals 
+Molecules are separated by `+` signs. Coefficients are just syntactic sugar for multiple calls to the same function, so `H_2 + 20` desugars into `H_2 + O + O`, and `Li_4 + 4light` into `Li_4 + light + light + light + light`.
