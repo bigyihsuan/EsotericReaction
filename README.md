@@ -56,7 +56,8 @@ Equations are chemicals separated by an equation symbol.
 
 The equation symbol can be one of the following two symbols:
 
-* `=`: Bind a name (product) to functions (reagents)
+* `=`: Bind a name (product) to functions (reagents). The name consists of all the elements expanded and concatenated together.
+  * For example, `[lhs] = 2H + CO_2` stores `[lhs]` into the variable `HHCOO`.
 * `->`: The result of the reagents is stored in the memory location indexed by the result of the product.
   * If the product results in a list, the result of the reagents is stored in each location indexed by each element of the list.
 
