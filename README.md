@@ -39,7 +39,7 @@ Equations are always of the following grammar:
 ```
 <equation> = <term> <eq>
 <eq> = '=' <name> | '->' <term>
-<name> = [a-z][a-z0-9]*, not `light` or `heat`
+<name> = STRING, not `light` or `heat`
 <term> = <molecule> '+' <term> | <molecule>
 <molecule> = <num> <submolecule> | <atomGroup>
 <atomGroup> = '(' <submolecule> ')'
