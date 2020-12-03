@@ -6,14 +6,18 @@ A stack-based/functional esolang using chemical "formulas" as code. The name is 
 
 Number: A real number.
 
-* When used with list indexing, only the integer part is used.
+* When used with list indexing and function referencing, only the integer part is used.
 * Characters are represented as their UTF-8/ASCII value in the integer part.
 
-List: an infinitely-nestable heterogenous list that can hold values.
+List: An infinitely-nestable heterogenous list that can hold values.
 
 * Lists consisting of solely integer values can be considered as Strings.
 * Lists can contain lists.
 * Lists can be of any length.
+
+Function: A function reference, used primarily in higher-order functions.
+
+* A number representing the function is pushed to the stack through a different function.
 
 ## Elements
 
@@ -36,7 +40,15 @@ Undiscovered elements must satisfy the following:
 * Only contains the following characters (from 0-9):
   * `nubtqphsoe`
 
-*TODO: add rules on how to make element names here*
+To make a name of atomic number `N`, do the following pseudocode:
+
+``` python
+For each digit,
+  append its letter value:
+    n -> 0, u -> 1, b -> 2, t -> 3, q -> 4,
+    p -> 5, h -> 6, s -> 7, o -> 8, e -> 9
+Capitalize the first letter.
+```
 
 ### Light and Heat
 
@@ -60,15 +72,22 @@ Heat allows programs to output to STDOUT.
 
 Equations are always of the following grammar:
 
-```
-TODO
+```bnf
+<equation> ::= <reagent> <rhs> | <COMMENT> | <reagent> <rhs> <COMMENT>
+<rhs>      ::= "=" <NAME> | "->" <reagent>
+<reagent>  ::= <term> | <term> "+" <reagent>
+<term>     ::= <molecule> | <NUMBER> <molecule>
+<molecule> ::= <atom> | <atom> <molecule>
+<atom>     ::= <ELEMENT> | <name> "_" <NUMBER>
+<NUMBER>   ::= number > 1
+<ELEMENT>  ::= valid element
+<NAME>     ::= valid systematic chemical symbol
+<COMMENT>  ::= ";" text "\n"
 ```
 
 Comments are signified by a semicolon `; comment up to the end of the line`.
 
-Equations are chemicals separated by an equation symbol.
-
-The equation symbol can be one of the following two symbols:
+Equations are chemicals separated by an equation symbol. The equation symbol can be one of the following two symbols:
 
 * `=`: Definition. Bind a name (product) to functions (reagents). The name is a systematic element name (see above).
 * `->`: Execute the preceeding function calls.
@@ -80,7 +99,7 @@ Each element can have a subscript `_N` appended, representing a differing number
 
 Elements concatenated together are molecules. This represents a composition of the elements from left to right:
 
-```
+```asm
 CNH + A -> C(N(H(A)))
 CO_2 + A + B -> C(O(A,B))
 C_3H_6 + X + Y + 6Z
@@ -88,11 +107,15 @@ C_3H_6 + X + Y + 6Z
     -> C(X,Y,H(Z,Z,Z,Z,Z,Z))
 ```
 
+## Recursion
+
+Recursion to an arbitrary depth is possible in Esoteric Reaction. This is done through naming and calling a function in its body, in this case in its reagents. 
+
 ## Example Equations
 
 ### Cat
 
-```
+```lisp
 light + heat + Uue = Uue ; Declare a recursive cat, 1 byte at a time forever.
 Uue -> Uue               ; Call cat.
 ```
