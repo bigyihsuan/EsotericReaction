@@ -1,18 +1,19 @@
 # Esoteric Reaction
 
-An esolang using chemical "formulas" as code. The name is a pun on "exothermic reaction".
-
-Yes, imbalanced and impossible equations are possible.
+A stack-based/functional esolang using chemical "formulas" as code. The name is a pun on "exothermic reaction".
 
 ## Types
 
-Integer: bog-standard 64-bit signed integer.
+Number: A real number.
 
-* Floating point numbers are represented by taking their IEEE 754 double-precision (64-bits long) binary representation and interpreting it as an integer.
+* When used with list indexing, only the integer part is used.
+* Characters are represented as their UTF-8/ASCII value in the integer part.
 
 List: an infinitely-nestable heterogenous list that can hold values.
 
-* Lists consisting of solely integer values can be considered as Strings. Each integer represents a character's value in UTF-8.
+* Lists consisting of solely integer values can be considered as Strings.
+* Lists can contain lists.
+* Lists can be of any length.
 
 ## Elements
 
@@ -22,32 +23,45 @@ Coefficients indicate that element being repeated several times. So `2O == O + O
 
 Subscripts change the number of arguments expected for the function. So `Li_3` expects 3 arguments following it.
 
-Strings of consecutive elements (`H_20`, `NLi_4`, etc) represents function composition from right to left. So, `ABC` is `C(B(A()))`.
+Strings of consecutive elements (`H_2O`, `NLi_4`, etc) represents function composition from right to left. So, `H_2O` is `O(H_2())`.
+
+### Undiscovered Elements
+
+Undiscovered elements (atomic number N >= 119, `Uue`) are available as bindable names. Use `=` equations to bind functions to a name.
+
+Undiscovered elements must satisfy the following:
+
+* The first character is uppercase, while all other characters are lowercase.
+* When converting to an atomic number `N`, satisfies `N >= 119`.
+* Only contains the following characters (from 0-9):
+  * `nubtqphsoe`
+
+*TODO: add rules on how to make element names here*
 
 ### Light and Heat
 
-`light` and `heat` are special elements. `light` handles STDIO, and `heat` handles the equation pointer.
+`light` and `heat` are special elements that handle STDIO. `light` is input, and `heat` is output.
 
-`light` on the reagent side returns a single line of STDIN. On the product side, `light` prints the result of the reagents to STDOUT.
+#### Light
 
-`heat` as an reagent returns the value of the equation pointer, i.e. the line of code that is currently executing. As a product the result of the reagents gets stored in `heat` (the equation pointer changes).
+Light allows programs to take input from STDIN.
+
+* `light`: Take 1 byte from STDIN and push it onto the stack.
+* `light_N`: Take `N` bytes from STDIN and push it as a list of numbers onto the stack.
+
+#### Heat
+
+Heat allows programs to output to STDOUT.
+
+* `heat`: Pop 1 element from the stack and output it to STDOUT.
+* `heat_N`: Pop `N` elements from the stack and output them, in order, to STDOUT.
 
 ## Equations
 
 Equations are always of the following grammar:
 
 ```
-<equation> = <term> <eq>
-<eq> = '=' <name> | '->' <term>
-<name> = STRING, not `light` or `heat`
-<term> = <molecule> '+' <term> | <molecule>
-<molecule> = <num> <submolecule> | <atomGroup>
-<atomGroup> = '(' <submolecule> ')'
-<submolecule> = <atom><atom> | <atom> | 'light' | 'heat'
-<atom> = <element> | <element> '_' <sub>
-<num> = [2-9] | <sub>
-<sub> = [1-9][0-9]*
-<element> = any element on the periodic table
+TODO
 ```
 
 Comments are signified by a semicolon `; comment up to the end of the line`.
@@ -56,17 +70,29 @@ Equations are chemicals separated by an equation symbol.
 
 The equation symbol can be one of the following two symbols:
 
-* `=`: Bind a name (product) to functions (reagents). The name consists of all the elements expanded and concatenated together.
-  * For example, `[lhs] = 2H + CO_2` stores `[lhs]` into the variable `HHCOO`.
-* `->`: The result of the reagents is stored in the memory location indexed by the result of the product.
-  * If the product results in a list, the result of the reagents is stored in each location indexed by each element of the list.
+* `=`: Definition. Bind a name (product) to functions (reagents). The name is a systematic element name (see above).
+* `->`: Execute the preceeding function calls.
+  * Both sides of the equation must follow the Law of Conservation of Mass. `light` and `heat` are exempt from this restriction.
 
-Molecules are separated by `+` signs. Coefficients are just syntactic sugar for multiple calls to the same function, so `H_2 + 20` desugars into `H_2 + O + O`, and `Li_4 + 4light` into `Li_4 + light + light + light + light`.
+Equations consist of terms spearated by `+` signs. Each term consists of molecules or elements. Both can be prepended by a coefficient `N`, which is syntactic sugar for `N` of those terms appearing. (`2H_2` is the same as `H_2 + H_2`.)
+
+Each element can have a subscript `_N` appended, representing a differing number of arguments. `H` takes either 0 or 1 arguments, while `H_2` takes 2. Arguments are filled through additional terms.
+
+Elements concatenated together are molecules. This represents a composition of the elements from left to right:
+
+```
+CNH + A -> C(N(H(A)))
+CO_2 + A + B -> C(O(A,B))
+C_3H_6 + X + Y + 6Z
+    -> C_2H_6 + X + Y + Z + Z + Z + Z + Z + Z
+    -> C(X,Y,H(Z,Z,Z,Z,Z,Z))
+```
 
 ## Example Equations
 
-**Cat**
+### Cat
 
 ```
-light -> light
+light + heat + Uue = Uue ; Declare a recursive cat, 1 byte at a time forever.
+Uue -> Uue               ; Call cat.
 ```
