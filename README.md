@@ -1,6 +1,6 @@
 # Esoteric Reaction
 
-A stack-based/functional esolang using chemical "formulas" as code. The name is a pun on "exothermic reaction".
+A stack-based/functional/concatenative? esolang using chemical "formulas" as code. The name is a pun on "exothermic reaction".
 
 ## Types
 
@@ -109,7 +109,18 @@ C_3H_6 + X + Y + 6Z
 
 ## Recursion
 
-Recursion to an arbitrary depth is possible in Esoteric Reaction. This is done through naming and calling a function in its body, in this case in its reagents. 
+Recursion to an arbitrary depth is possible in Esoteric Reaction. This is done through naming and calling a function in its body, in this case in its reagents.
+
+```lisp
+CoDe + Uue = Uue ; recursive declaration
+Uue -> Uue ; function call
+```
+
+## The Stack
+
+Esoteric Reaction relies on 2 stacks: a call stack and a data stack. Because of Esoteric Reaction's ordering of code, a call stack is needed to allow for the execution of earlier function calls after later ones.
+
+Let's consider the factorial implementation, seen below.
 
 ## Example Equations
 
@@ -118,4 +129,11 @@ Recursion to an arbitrary depth is possible in Esoteric Reaction. This is done t
 ```lisp
 light + heat + Uue = Uue ; Declare a recursive cat, 1 byte at a time forever.
 Uue -> Uue               ; Call cat.
+```
+
+### Factorial
+
+```lisp
+; Factorial (n -- n!)
+
 ```
