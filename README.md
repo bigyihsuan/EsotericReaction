@@ -15,15 +15,13 @@ List: An infinitely-nestable heterogenous list that can hold values.
 * Lists can contain lists.
 * Lists can be of any length.
 
-Function: A function reference, used primarily in higher-order functions.
-
-* A number representing the function is pushed to the stack through a different function.
+Function: A function reference, used primarily in higher-order functions, but in some control flow instructions as well.
 
 ## Elements
 
 Each of the 118 elements of the periodic table represents a different function/instruction.
 
-Coefficients indicate that element being repeated several times. So `2O == O + O`.
+Coefficients indicate that element being repeated several times. So `2O -> O + O`.
 
 Subscripts change the number of arguments expected for the function. So `Li_3` expects 3 arguments following it.
 
@@ -42,12 +40,21 @@ Undiscovered elements must satisfy the following:
 
 To make a name of atomic number `N`, do the following pseudocode:
 
-``` python
+```python
 For each digit,
   append its letter value:
     n -> 0, u -> 1, b -> 2, t -> 3, q -> 4,
     p -> 5, h -> 6, s -> 7, o -> 8, e -> 9
 Capitalize the first letter.
+```
+
+### Grouped Elements
+
+Grouped elements are elements defined in a `=` equation and enclosed in parentheses `()`. Any arbitrary string can be placed inside, and are considered a single element. Do note you will still need to make sure that the equations are still balanced.
+
+```lisp
+S + To + P = (stop)   ; create grouped element (stop)
+2(stop)_2 -> 4S + 4ToP ; call (stop)
 ```
 
 ### Light and Heat
@@ -79,7 +86,7 @@ Equations are always of the following grammar:
 <term>     ::= <molecule> | <NUMBER> <molecule>
 <molecule> ::= <atom> | <atom> <molecule>
 <atom>     ::= <ELEMENT> | <name> "_" <NUMBER>
-<NUMBER>   ::= number > 1
+<NUMBER>   ::= integer > 0
 <ELEMENT>  ::= valid element
 <NAME>     ::= valid systematic chemical symbol
 <COMMENT>  ::= ";" text "\n"
@@ -95,7 +102,7 @@ Equations are chemicals separated by an equation symbol. The equation symbol can
 
 Equations consist of terms spearated by `+` signs. Each term consists of molecules or elements. Both can be prepended by a coefficient `N`, which is syntactic sugar for `N` of those terms appearing. (`2H_2` is the same as `H_2 + H_2`.)
 
-Each element can have a subscript `_N` appended, representing a differing number of arguments. `H` takes either 0 or 1 arguments, while `H_2` takes 2. Arguments are filled through additional terms.
+Each element can have a subscript `_N` appended, representing a different function.
 
 Elements concatenated together are molecules. This represents a composition of the elements from left to right:
 
@@ -107,14 +114,35 @@ C_3H_6 + X + Y + 6Z
     -> C(X,Y,H(Z,Z,Z,Z,Z,Z))
 ```
 
+### Law of Conservation of Mass
+
+All `->` equations must follow the Law of Conservation of Mass, where both product and reagent must contain the same number and type of atoms. Light and heat are exempt from this law. If the law is found to be volated, it is considered a syntax error and parsing will stop.
+
+```lisp
+2H_2 + O_2 = (water)
+(water) -> 2H_20
+Na + Cl -> NaCl
+Na + Cl -> Na + Cl
+```
+
 ## Recursion
 
 Recursion to an arbitrary depth is possible in Esoteric Reaction. This is done through naming and calling a function in its body, in this case in its reagents.
 
 ```lisp
-CoDe + Uue = Uue ; recursive declaration
-Uue -> Uue ; function call
+CoDe + (rec) = (rec) ; recursive declaration
+(rec) -> Co + De + (rec) ; function call
 ```
+
+## Truthiness
+
+In Esoteric Reaction, truthiness is defined as follows:
+
+Truthy | Falsy
+-|-
+Non-zero | Zero
+Filled list | Empty list
+Code | -
 
 ## The Stack
 
@@ -135,5 +163,8 @@ Uue -> Uue               ; Call cat.
 
 ```lisp
 ; Factorial (n -- n!)
+; construct list n to 1, then reduce multiply
+Dy + Li + SbH_2O_1 
+; (n [n] -- )
 
 ```

@@ -24,14 +24,14 @@ Element  | Arg Types | Return Types | Notes
 Element | Arg Types | Return Types | Notes
 -|-|-|-
 `Li` | - | List | Push an empty list.
-`Li_N` | Any, ... | List | List-ify the next N elements into a list.
+`Li_N` | Num n, Any, ... | List | List-ify the next n elements into a list.
 `La` | List | Any, ... | De-list-ify a list into its elements.
 `Ac` | List, Any | List | Append an element to the list.
 `Ac_N` | List, Any, ... | List | Append N elements to the list (in stack order).
 `He` | List | Any, List | Push the head of a list and then the rest.
-`He_N` | List | List, List | Push the first N elements of a list and then the rest.
+`He_N` | Num n, List | List, List | Push the first `n` elements of a list and then the rest.
 `Ta` | List | Any, List | Push the tail of a list and then the rest.
-`Ta_N` | List | List, List | Push the last N elements of a list and then the rest.
+`Ta_N` | Num n, List | List, List | Push the last `n` elements of a list and then the rest.
 
 ## Stack Operations
 
@@ -51,12 +51,14 @@ Element | Arg Types | Return Types | Notes
 `In` | Fun | - | Interpret.
 `F` | Fun, List | List | Filter. Applies f on all elements of l. Returns a list where the result of f is truthy.
 `Fe` | Fun, List | List | For Each/Map. Returns a list with f applied on l.
+`Re` | Fun f, Any a, List l | Num | Reduce left-to-right, starting at a on l.
+`Rf` | Fun f, Any a, List l | Num | Reduce right-to-left, starting at a on l.
 
 ## Control Flow Functions
 
 Element | Arg Types | Return Types | Notes
 -|-|-|-
-`I` | Any cond, Fun then, Fun else | Fun | If-Then-Else. Returns the branch based on the truthiness of cond.
+`I` | Any cond, Fun then, Fun else | Fun | If-Then-Else. Returns code based on the truthiness of cond. then if truthy, else if falsy.
 
 ## I/O
 
@@ -64,7 +66,7 @@ I/O is handled by `light` and `heat`.
 
 Element | Arg Types | Return Types | Notes
 -|-|-|-
-`light` | - | Num | Pushes 1 byte from STDIN.
-`light_N` | - | List | Pushes N bytes from STDIN as a list.
-`heat` | Any | - | Pops 1 element and prints to STDOUT.
-`heat_N` | Any, N | - | Pops N elements and prints to STDOUT.
+`light` | - | Num | Push 1 byte from STDIN.
+`light_N` | Num n, ... | List, ... | Pop N to get length of lists to push. Push n bytes from STDIN as a list.
+`heat` | Any | - | Pop 1 element and print to STDOUT.
+`heat_N` | Num n, Any, ... | - | Pop n elements and print to STDOUT.
