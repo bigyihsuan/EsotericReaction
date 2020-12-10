@@ -31,7 +31,7 @@ namespace Interpreter.Lexer {
         }
 
         public override string ToString() {
-            return "<" + this.type + ", '" + this.lexeme + "' " + this.literal + ">";
+            return "<" + this.line + ": " + this.type + ", '" + this.lexeme + "', " + this.literal + ">";
         }
     }
 
@@ -85,6 +85,9 @@ namespace Interpreter.Lexer {
                 case '+':
                     AddToken(TokenType.PLUS);
                     break;
+                case '(':
+                    Name();
+                    break;
                 case ' ':
                 case '\r':
                 case '\t':
@@ -95,56 +98,44 @@ namespace Interpreter.Lexer {
                 default:
                     if (char.IsDigit(c)) {
                         Coeff();
-                    } else {
+                    } else if (char.IsLetter(c)) {
                         Element();
                     }
                     break;
                 }
         }
 
+        private void Name() {
+            while (!Match(')')) {
+                Advance();
+            }
+            AddToken(TokenType.NAME, source.Substring(start+1, current - start - 1));
+        }
+
         private void Element() {
-            if (elements.Contains(source.Substring(start, 2))) {
-                // 2-char elements
-                Advance();
-                AddToken(TokenType.ELEMENT, source.Substring(start, current - start));
-            } else if (elements.Contains(source.Substring(start, 1))) {
-                // 1-char element
-                AddToken(TokenType.ELEMENT, source.Substring(start, current - start));
-            } else if (current + 4 < source.Length) {
-                if (source.Substring(current, 4) == "heat") {
-                    // heat
-                    for (int i = 1; i < 4; i++) {
-                        Advance();
-                    }
-                    AddToken(TokenType.ELEMENT, source.Substring(current, current - start));
-                }
-                Advance();
-                if (current + 5 < source.Length) {
-                    if (source.Substring(current, 5) == "light") {
-                        // light
-                        for (int i = 1; i < 5; i++) {
-                            Advance();
-                        }
-                        AddToken(TokenType.ELEMENT, source.Substring(current, current - start));
-                    }
-                }
-            } else {
-                // name
-                while (!elements.Contains(source.Substring(current, current - start))
-                    && source.Substring(current, current - start) != "light"
-                    && source.Substring(current, current - start) != "heat") {
+            if (Peek() == 'h' || Peek() == 'l') {
+                while (char.IsLetter(Peek())) {
                     Advance();
                 }
-                AddToken(TokenType.NAME, source.Substring(current, current - start));
+                AddToken(TokenType.ELEMENT, source.Substring(start, current - start));
+            } else {
+                if (elements.Contains(source.Substring(start, 2))) {
+                    // 2-char elements
+                    Advance();
+                    AddToken(TokenType.ELEMENT, source.Substring(start, current - start));
+                } else if (elements.Contains(source.Substring(start, 1))) {
+                    // 1-char element
+                    AddToken(TokenType.ELEMENT, source.Substring(start, current - start));
+                }
             }
         }
 
         private void Subscript() {
-            Advance();
+            //Advance();
             while (char.IsDigit(Peek())) {
                 Advance();
             }
-            AddToken(TokenType.SUBSCRIPT, int.Parse(source.Substring(start+1, current - start)));
+            AddToken(TokenType.SUBSCRIPT, int.Parse(source.Substring(start+1, current - start - 1)));
         }
 
         private void Coeff() {

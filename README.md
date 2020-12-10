@@ -69,10 +69,10 @@ Elements are the elemental building block of Esoteric Reaction, representing a f
 
 ### Element Groups
 
-Functions can be assigned an arbitrary name via the `=` operator. They can then use this name to call that snippet of code later. Convention is to surround the name in parnetheses, but the name can be any non-whitespace, non-`+_` string of characters.
+Functions can be assigned an arbitrary name via the `=` operator. They can then use this name to call that snippet of code later. Names must be surrounded by parentheses (as they are a grouping of elements), and can have any non-whitespace, non-`+_()` string of characters.
 
 ```lisp
-Co + De = CoDe ; definition
+Co + De = (CoDe) ; definition
 (CoDe) -> CoDe ; call
 3 (CoDe) + H -> 2 CoDe + CoDeH ; call with coefficent
 (CoDe)_3 + H -> 3 CoDe + H ; call with subscript
