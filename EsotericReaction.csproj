@@ -187,7 +187,8 @@
     <None Include="sample\factorial.er" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="src\Class1.cs" />
+    <Compile Include="src\Token.cs" />
+    <Compile Include="src\SyntaxTree.cs" />
     <Compile Include="src\EsoReaction.cs" />
     <Compile Include="src\Lexer.cs" />
   </ItemGroup>

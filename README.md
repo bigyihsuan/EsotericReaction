@@ -43,7 +43,7 @@ Equations also have two operators.
 ```
 <equation> ::= <reagent> <rhs> | <COMMENT> | <reagent> <rhs> <COMMENT>
 <rhs>      ::= "=" <NAME> | "->" <reagent>
-<reagent>  ::= <term> | <reagent> "+" <term>
+<reagent>  ::= <term> | <term> "+" <reagent>
 <term>     ::= <molecule> | <NUMBER> <molecule>
 <molecule> ::= <atom> | <atom> <molecule>
 <atom>     ::= <ELEMENT> | <name> "_" <NUMBER>
