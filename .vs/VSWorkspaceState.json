@@ -1,8 +1,9 @@
 {
   "ExpandedNodes": [
     "",
+    "\\sample",
     "\\src"
   ],
-  "SelectedNode": "\\src\\Lexer.cs",
+  "SelectedNode": "\\README.md",
   "PreviewInSolutionExplorer": false
 }

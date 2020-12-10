@@ -40,10 +40,10 @@ Equations also have two operators.
 `=` defines groups and terms of elements, and `->` executes terms.
 `->` equations require both sides to be balanced to follow the Law of Conservation of Mass.
 
-```bnf
+```
 <equation> ::= <reagent> <rhs> | <COMMENT> | <reagent> <rhs> <COMMENT>
 <rhs>      ::= "=" <NAME> | "->" <reagent>
-<reagent>  ::= <term> | <term> "+" <reagent>
+<reagent>  ::= <term> | <reagent> "+" <term>
 <term>     ::= <molecule> | <NUMBER> <molecule>
 <molecule> ::= <atom> | <atom> <molecule>
 <atom>     ::= <ELEMENT> | <name> "_" <NUMBER>

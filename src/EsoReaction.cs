@@ -1,10 +1,10 @@
 using System;
 using System.IO;
-using System.Collections;
 using System.Collections.Generic;
-using Interpreter.Lexer;
+using EsotericReaction.Lex;
+using EsotericReaction.Tok;
 
-namespace Interpreter {
+namespace EsotericReaction {
     public class EsoReaction {
         static bool hadError = false;
         public static bool debug = false;
@@ -33,7 +33,7 @@ namespace Interpreter {
         }
 
         static void Run(string file) {
-            Lexer.Lexer lexer = new Lexer.Lexer(File.ReadAllText(file));
+            Lexer lexer = new Lexer(File.ReadAllText(file));
             List<Token> tokens = lexer.ScanTokens();
 
             foreach (var t in tokens) {

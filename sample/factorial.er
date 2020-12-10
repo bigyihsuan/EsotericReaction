@@ -1,7 +1,7 @@
 ; Factorial (n -- n!)
 ; Use recursion to calculate the factorial.
 Dy + HeO + O + 2Cl + Fl_2 + OCl + DyOClS(!)F + I = (!)
-; element composition: 2 Dy + He + 4 O + 4 Cl + 2Fl + S + F
+; elemental composition: 2 Dy + He + 4 O + 4 Cl + 2Fl + S + F
 O + 4Cl(!) + heat -> (!) + Cl_4O ; call and print with n=4
 
 ; trace
