@@ -1,3 +1,3 @@
 #!/bin/bash
 
-mcs -out:EsoReaction src/*.cs
+mcs -out:./EsoReaction src/*.cs
