@@ -1,16 +1,21 @@
-﻿using System;
-using System.Text;
+﻿using System.Text;
 using EsotericReaction.Tok;
 
-namespace EsotericReaction.Syntax {
+/* TODO:
+    * Add Code class that has a List<Equation>
+    * Reagent has List<Term>
+    * Term has Coefficient and List<Atom>
+ */
+
+namespace EsotericReaction.Ast {
     interface Visitor<R> {
         R VisitAssignmentExpression(Assignment expr);
         R VisitExecutionExpression(Execution expr);
         R VisitReagentExpression(Reagent expr);
         R VisitTermExpression(Term expr);
         R VisitMoleculeExpression(Molecule expr);
-        R VisitAtomExpression(Atom expr);
         R VisitElementExpression(Element expr);
+        R VisitCoefficientExpression(Coefficient expr);
     }
     abstract class Expression {
         public abstract R Accept<R>(Visitor<R> visitor);
@@ -18,15 +23,15 @@ namespace EsotericReaction.Syntax {
 
     class AstPrinter : Visitor<string> {
 
-        string Print(Expression expr) {
+        public string Print(Expression expr) {
             return expr.Accept(this);
         }
 
         public string VisitAssignmentExpression(Assignment expr) {
-            return Parenthesize("=", expr.reagent, expr.reagent);
+            return Parenthesize("=", expr.reagent, expr.group);
         }
         public string VisitExecutionExpression(Execution expr) {
-            return Parenthesize("->", expr.reagent, expr.reagent);
+            return Parenthesize("->", expr.reagent, expr.product);
         }
 
         public string VisitReagentExpression(Reagent expr) {
@@ -34,19 +39,19 @@ namespace EsotericReaction.Syntax {
         }
 
         public string VisitTermExpression(Term expr) {
-            return Parenthesize("Term", expr.molecule);
+            return Parenthesize("Term", expr.coefficient, expr.molecule);
         }
 
         public string VisitMoleculeExpression(Molecule expr) {
             return Parenthesize("Molecule", expr.left, expr.right);
         }
 
-        public string VisitAtomExpression(Atom expr) {
-            return Parenthesize("", expr.element);
+        public string VisitElementExpression(Element expr) {
+            return Parenthesize(expr.element.lexeme, expr.subscript);
         }
 
-        public string VisitElementExpression(Element expr) {
-            return Parenthesize("", expr);
+        public string VisitCoefficientExpression(Coefficient expr) {
+            return expr.coefficient.lexeme;
         }
 
         private string Parenthesize(string name, params Expression[] exprs) {
@@ -64,7 +69,7 @@ namespace EsotericReaction.Syntax {
         public readonly Reagent reagent;
         public readonly Reagent group;
 
-        Assignment(Reagent reagent, Reagent group) {
+        public Assignment(Reagent reagent, Reagent group) {
             this.reagent = reagent;
             this.group = group;
         }
@@ -78,7 +83,7 @@ namespace EsotericReaction.Syntax {
         public readonly Reagent reagent;
         public readonly Reagent product;
 
-        Execution(Reagent reagent, Reagent product) {
+        public Execution(Reagent reagent, Reagent product) {
             this.reagent = reagent;
             this.product = product;
         }
@@ -92,7 +97,7 @@ namespace EsotericReaction.Syntax {
         public readonly Term left;
         public readonly Reagent right;
 
-        Reagent(Term left, Reagent right) {
+        public Reagent(Term left, Reagent right) {
             this.left = left;
             this.right = right;
         }
@@ -103,10 +108,10 @@ namespace EsotericReaction.Syntax {
     }
 
     class Term : Expression {
-        public readonly Token coefficient;
+        public readonly Coefficient coefficient;
         public readonly Molecule molecule;
 
-        Term(Token coefficient, Molecule molecule) {
+        public Term(Coefficient coefficient, Molecule molecule) {
             this.coefficient = coefficient;
             this.molecule = molecule;
         }
@@ -117,10 +122,10 @@ namespace EsotericReaction.Syntax {
     }
 
     class Molecule : Expression {
-        public readonly Atom left;
+        public readonly Element left;
         public readonly Molecule right;
 
-        Molecule(Atom left, Molecule right) {
+        public Molecule(Element left, Molecule right) {
             this.left = left;
             this.right = right;
         }
@@ -130,29 +135,29 @@ namespace EsotericReaction.Syntax {
         }
     }
 
-    class Atom : Expression {
-        public readonly Element element;
-        public readonly Token subscript;
+    class Element : Expression {
+        public readonly Token element;
+        public readonly Coefficient subscript;
 
-        Atom(Element element, Token subscript) {
+        public Element(Token element, Coefficient subscript) {
             this.element = element;
             this.subscript = subscript;
         }
 
         public override R Accept<R>(Visitor<R> visitor) {
-            return visitor.VisitAtomExpression(this);
+            return visitor.VisitElementExpression(this);
         }
     }
 
-    class Element : Expression {
-        public readonly Token element;
+    class Coefficient : Expression {
+        public readonly Token coefficient;
 
-        Element(Token element) {
-            this.element = element;
+        public Coefficient(Token coefficient) {
+            this.coefficient = coefficient;
         }
 
         public override R Accept<R>(Visitor<R> visitor) {
-            return visitor.VisitElementExpression(this);
+            return visitor.VisitCoefficientExpression(this);
         }
     }
 }

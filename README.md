@@ -60,7 +60,7 @@ Equations also have two operators.
 <assignment> -> <reagent> "=" <NAME>
 <execution>	 -> <reagent> "->" <reagent>
 <reagent>	 -> <term> ("+" <term>)*
-<term>		 -> (<COEFF>)* <atom>+
+<term>		 -> <COEFF>? <atom>+
 <atom>		 -> <element> ("_" <COEFF>)?
 <element>	 -> element | "(" name ")"
 ```

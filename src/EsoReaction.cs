@@ -3,6 +3,7 @@ using System.IO;
 using System.Collections.Generic;
 using EsotericReaction.Lex;
 using EsotericReaction.Tok;
+using EsotericReaction.Ast;
 
 namespace EsotericReaction {
     public class EsoReaction {
@@ -28,7 +29,9 @@ namespace EsotericReaction {
                     }
                 }
                 Run(args[fileIndex]);
-                if (hadError) Environment.Exit(65);
+                if (hadError) {
+                    Environment.Exit(65);
+                }
             }
         }
 
