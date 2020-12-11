@@ -20,6 +20,7 @@ namespace EsotericReaction.Lex {
         }
 
         public List<Token> ScanTokens() {
+            AddToken(TokenType.EQUSTART);
             while (!IsAtEnd()) {
                 start = current;
                 ScanToken();
@@ -63,6 +64,7 @@ namespace EsotericReaction.Lex {
                     break;
                 case '\n':
                     line++;
+                    AddToken(TokenType.EQUSTART);
                     break;
                 default:
                     if (char.IsDigit(c)) {

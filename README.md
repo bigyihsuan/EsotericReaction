@@ -41,6 +41,7 @@ Equations also have two operators.
 `->` equations require both sides to be balanced to follow the Law of Conservation of Mass.
 
 ```
+<code>	   ::= <equation> | <equation> <code>
 <equation> ::= <reagent> <rhs> | <COMMENT> | <reagent> <rhs> <COMMENT>
 <rhs>      ::= "=" <NAME> | "->" <reagent>
 <reagent>  ::= <term> | <term> "+" <reagent>
@@ -51,6 +52,17 @@ Equations also have two operators.
 <ELEMENT>  ::= valid element
 <NAME>     ::= non-whitespace, non-"_+;" string
 <COMMENT>  ::= ";" text "\n"
+```
+
+```
+<code>		 -> <equation>*
+<equation>	 -> <assigment> | <execution>
+<assignment> -> <reagent> "=" <NAME>
+<execution>	 -> <reagent> "->" <reagent>
+<reagent>	 -> <term> ("+" <term>)*
+<term>		 -> (<COEFF>)* <atom>+
+<atom>		 -> <element> ("_" <COEFF>)?
+<element>	 -> element | "(" name ")"
 ```
 
 ## Terms

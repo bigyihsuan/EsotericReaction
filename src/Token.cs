@@ -1,6 +1,6 @@
 ﻿namespace EsotericReaction.Tok {
     public enum TokenType {
-        EQUAL, ARROW, PLUS, ELEMENT, NAME, COEFF, SUBSCRIPT, EOF
+        EQUSTART, EQUAL, ARROW, PLUS, ELEMENT, NAME, COEFF, SUBSCRIPT, EOF
     }
 
     public class Token {
@@ -25,6 +25,14 @@
 
         public override string ToString() {
             return "<" + this.line + ": " + this.type + ", '" + this.lexeme + "', " + this.literal + ">";
+        }
+
+        public override bool Equals(object obj) {
+            return base.Equals(obj);
+        }
+
+        public override int GetHashCode() {
+            return base.GetHashCode();
         }
     }
 }

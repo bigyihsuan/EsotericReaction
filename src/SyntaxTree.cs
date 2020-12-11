@@ -1,97 +1,158 @@
 ﻿using System;
+using System.Text;
 using EsotericReaction.Tok;
 
 namespace EsotericReaction.Syntax {
-
-    abstract class Equation {
-        interface Visitor<R> {
-            R VisitAssignmentEquation(Assignment equation);
-            R VisitExecutionEquation(Execution equation);
-        }
-
-        class Assignment : Equation {
-            readonly Reagent reagent;
-            readonly Token sign;
-            readonly Token group;
-
-            Assignment(Reagent reagent, Token sign, Token group) {
-                this.reagent = reagent;
-                this.sign = sign;
-                this.group = group;
-            }
-
-
-        }
-
-        class Execution : Equation {
-            readonly Reagent reagent;
-            readonly Token sign;
-            readonly Reagent product;
-
-            Execution(Reagent reagent, Token sign, Reagent product) {
-                this.reagent = reagent;
-                this.sign = sign;
-                this.product = product;
-            }
-
-            override R Accept<R>(Visitor<R> visitor) {
-                throw new NotImplementedException();
-            }
-        }
-
-        virtual R Accept<R>(Visitor<R> visitor);
+    interface Visitor<R> {
+        R VisitAssignmentExpression(Assignment expr);
+        R VisitExecutionExpression(Execution expr);
+        R VisitReagentExpression(Reagent expr);
+        R VisitTermExpression(Term expr);
+        R VisitMoleculeExpression(Molecule expr);
+        R VisitAtomExpression(Atom expr);
+        R VisitElementExpression(Element expr);
+    }
+    abstract class Expression {
+        public abstract R Accept<R>(Visitor<R> visitor);
     }
 
-    abstract class Expression { }
+    class AstPrinter : Visitor<string> {
+
+        string Print(Expression expr) {
+            return expr.Accept(this);
+        }
+
+        public string VisitAssignmentExpression(Assignment expr) {
+            return Parenthesize("=", expr.reagent, expr.reagent);
+        }
+        public string VisitExecutionExpression(Execution expr) {
+            return Parenthesize("->", expr.reagent, expr.reagent);
+        }
+
+        public string VisitReagentExpression(Reagent expr) {
+            return Parenthesize("+", expr.left, expr.right);
+        }
+
+        public string VisitTermExpression(Term expr) {
+            return Parenthesize("Term", expr.molecule);
+        }
+
+        public string VisitMoleculeExpression(Molecule expr) {
+            return Parenthesize("Molecule", expr.left, expr.right);
+        }
+
+        public string VisitAtomExpression(Atom expr) {
+            return Parenthesize("", expr.element);
+        }
+
+        public string VisitElementExpression(Element expr) {
+            return Parenthesize("", expr);
+        }
+
+        private string Parenthesize(string name, params Expression[] exprs) {
+            StringBuilder builder = new StringBuilder();
+            builder.Append("(").Append(name);
+            foreach (Expression e in exprs) {
+                builder.Append(" ");
+                builder.Append(e.Accept(this));
+            }
+            builder.Append(")");
+            return builder.ToString();
+        }
+    }
+    class Assignment : Expression {
+        public readonly Reagent reagent;
+        public readonly Reagent group;
+
+        Assignment(Reagent reagent, Reagent group) {
+            this.reagent = reagent;
+            this.group = group;
+        }
+
+        public override R Accept<R>(Visitor<R> visitor) {
+            return visitor.VisitAssignmentExpression(this);
+        }
+    }
+
+    class Execution : Expression {
+        public readonly Reagent reagent;
+        public readonly Reagent product;
+
+        Execution(Reagent reagent, Reagent product) {
+            this.reagent = reagent;
+            this.product = product;
+        }
+
+        public override R Accept<R>(Visitor<R> visitor) {
+            return visitor.VisitExecutionExpression(this);
+        }
+    }
 
     class Reagent : Expression {
-        readonly Term left;
-        readonly Token sign;
-        readonly Reagent right;
+        public readonly Term left;
+        public readonly Reagent right;
 
-        Reagent(Term left, Token sign, Reagent right) {
+        Reagent(Term left, Reagent right) {
             this.left = left;
-            this.sign = sign;
             this.right = right;
+        }
+
+        public override R Accept<R>(Visitor<R> visitor) {
+            return visitor.VisitReagentExpression(this);
         }
     }
 
     class Term : Expression {
-        readonly int? coefficient;
-        readonly Molecule molecule;
+        public readonly Token coefficient;
+        public readonly Molecule molecule;
 
-        Term(int? coefficient, Molecule molecule) {
+        Term(Token coefficient, Molecule molecule) {
             this.coefficient = coefficient;
             this.molecule = molecule;
+        }
+
+        public override R Accept<R>(Visitor<R> visitor) {
+            return visitor.VisitTermExpression(this);
         }
     }
 
     class Molecule : Expression {
-        readonly Atom left;
-        readonly Molecule right;
+        public readonly Atom left;
+        public readonly Molecule right;
 
         Molecule(Atom left, Molecule right) {
             this.left = left;
             this.right = right;
         }
+
+        public override R Accept<R>(Visitor<R> visitor) {
+            return visitor.VisitMoleculeExpression(this);
+        }
     }
 
     class Atom : Expression {
-        readonly Element element;
-        readonly Token subscript;
+        public readonly Element element;
+        public readonly Token subscript;
 
         Atom(Element element, Token subscript) {
             this.element = element;
             this.subscript = subscript;
         }
+
+        public override R Accept<R>(Visitor<R> visitor) {
+            return visitor.VisitAtomExpression(this);
+        }
     }
 
     class Element : Expression {
-        readonly Token element;
+        public readonly Token element;
 
         Element(Token element) {
             this.element = element;
         }
-    }
 
+        public override R Accept<R>(Visitor<R> visitor) {
+            return visitor.VisitElementExpression(this);
+        }
+    }
 }
