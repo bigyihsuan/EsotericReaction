@@ -55,14 +55,13 @@ Equations also have two operators.
 ```
 
 ```
-<code>		 -> <equation>*
-<equation>	 -> <assigment> | <execution>
-<assignment> -> <reagent> "=" <NAME>
-<execution>	 -> <reagent> "->" <reagent>
-<reagent>	 -> <term> ("+" <term>)*
-<term>		 -> <COEFF>? <atom>+
-<atom>		 -> <element> ("_" <COEFF>)?
-<element>	 -> element | "(" name ")"
+<code>       -> <equation> | <equation> "\n" <code>
+<equation>   -> <reagent> "=" <NAME> | <reagent> "->" <reagent>
+<reagent>    -> <term> | <term> ("+" <term>)*
+<term>	     -> COEFF <molecule> | <molecule>
+<molecule>   -> <element> | <element><molecule>
+<element>    -> element | element <subscript> | "(" name ")" | "(" name ")" <subscript>
+<subscript>  -> "_" COEFF
 ```
 
 ## Terms

@@ -32,6 +32,10 @@
   <PropertyGroup>
     <RootNamespace>EsotericReaction</RootNamespace>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>
+    </StartupObject>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System" />
@@ -187,8 +191,9 @@
     <None Include="sample\factorial.er" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="src\Parser.cs" />
     <Compile Include="src\Token.cs" />
-    <Compile Include="src\SyntaxTree.cs" />
+    <Compile Include="src\Ast.cs" />
     <Compile Include="src\EsoReaction.cs" />
     <Compile Include="src\Lexer.cs" />
   </ItemGroup>

@@ -1,6 +1,6 @@
-﻿namespace EsotericReaction.Tok {
+﻿namespace EsotericReaction {
     public enum TokenType {
-        EQUSTART, EQUAL, ARROW, PLUS, ELEMENT, NAME, COEFF, SUBSCRIPT, EOF
+        EQUSEP, EQUAL, ARROW, PLUS, ELEMENT, NAME, COEFF, SUBSCRIPT, EOF
     }
 
     public class Token {

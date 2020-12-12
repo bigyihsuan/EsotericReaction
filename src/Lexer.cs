@@ -1,9 +1,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System;
-using EsotericReaction.Tok;
 
-namespace EsotericReaction.Lex {
+namespace EsotericReaction {
     public class Lexer {
         private readonly string source;
         private List<Token> tokens = new List<Token>();
@@ -20,7 +19,6 @@ namespace EsotericReaction.Lex {
         }
 
         public List<Token> ScanTokens() {
-            AddToken(TokenType.EQUSTART);
             while (!IsAtEnd()) {
                 start = current;
                 ScanToken();
@@ -64,7 +62,7 @@ namespace EsotericReaction.Lex {
                     break;
                 case '\n':
                     line++;
-                    AddToken(TokenType.EQUSTART);
+                    AddToken(TokenType.EQUSEP);
                     break;
                 default:
                     if (char.IsDigit(c)) {
