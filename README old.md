@@ -138,11 +138,11 @@ CoDe + (rec) = (rec) ; recursive declaration
 
 In Esoteric Reaction, truthiness is defined as follows:
 
-Truthy | Falsy
--|-
-Non-zero | Zero
-Filled list | Empty list
-Code | -
+| Truthy      | Falsy      |
+| ----------- | ---------- |
+| Non-zero    | Zero       |
+| Filled list | Empty list |
+| Code        | -          |
 
 ## The Stack
 

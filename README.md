@@ -1,109 +1,66 @@
 # Esoteric Reaction
 
-Esoteric Reaction is a functional/stack-based/concatenative esoteric programming language where code is chemical equations. 
+Esoteric Reaction is a functional/stack-based/concatenative esoteric programming language where code is chemical equations.
 
-Intepreter guided by [Crafting Interpreters](https://craftinginterpreters.com/).
+## Goals
+
+* Practice programming in Rust.
+* Write an esolang that looks like chemical equations.
+
+## Examples
+
+### Hello World
+
+```lisp
+S"Hello World!" + heat -> S
+; explanation
+S"Hello World!" ; push string literal
++ heat          ; pop an element, output to STDOUT
+-> S            ; conservation of mass
+```
+
+### Cat
+
+```lisp
+Li(light + heat) -> Li
+; explanation
+Li(            ; loop forever...
+  light + heat ; push a line of STDIN, pop and output to STDOUT
+)              ; end loop
+-> Li          ; conservation of mass
+```
+
+## Law of Conservation of Mass
+
+All Esoteric Reaction programs must follow the Law of Conservation of Mass:
+the number of atoms per element on the left side of the `->` must be equal to the number of atoms per element on the right side.
+
+Note that this is conservation of *mass*, and not energy.
+
+## Elements
+
+All 118 known elements are reserved for built-ins.
+
+### Unknown Elements
+
+### Light and Heat
+
+## Coefficients
+
+## Subscripts
+
+## Molecules
 
 ## Types
 
 ### Number
 
-Numbers are a floating point number.
-In most cases, only the integer part of the number is used.
+### String
 
-### Lists
+### List
 
-Lists are infinitely-nestable collections of elements.
-Lists can contain lists, numbers, and code.
+### Map
 
 ### Code
 
-Like in Lisp dialects, code is data that can be freely manipulated like other types in the language.
-
-### Truthiness
-
-In Esoteric Reaction, truthiness for logical operators is defined as follows:
-
-Truthy | Falsy
--|-
-Non-zero | Zero
-Filled list | Empty list
-Code | -
-
-## Equations
-
-Equations are code in Esoteric Reaction.
-Equations consist of sequences of terms, which contain elements or molecules.
-Each element represents a function call that takes and returns a stack.
-
-Equations also have two operators.
-`=` defines groups and terms of elements, and `->` executes terms.
-`->` equations require both sides to be balanced to follow the Law of Conservation of Mass.
-
-```
-<code>	   ::= <equation> | <equation> <code>
-<equation> ::= <reagent> <rhs> | <COMMENT> | <reagent> <rhs> <COMMENT>
-<rhs>      ::= "=" <NAME> | "->" <reagent>
-<reagent>  ::= <term> | <term> "+" <reagent>
-<term>     ::= <molecule> | <NUMBER> <molecule>
-<molecule> ::= <atom> | <atom> <molecule>
-<atom>     ::= <ELEMENT> | <name> "_" <NUMBER>
-<NUMBER>   ::= integer > 0
-<ELEMENT>  ::= valid element
-<NAME>     ::= non-whitespace, non-"_+;" string
-<COMMENT>  ::= ";" text "\n"
-```
-
-```
-<code>       -> <equation> | <equation> "\n" <code>
-<equation>   -> <reagent> "=" <NAME> | <reagent> "->" <reagent>
-<reagent>    -> <term> | <term> ("+" <term>)*
-<term>	     -> COEFF <molecule> | <molecule>
-<molecule>   -> <element> | <element><molecule>
-<element>    -> element | element <subscript> | "(" name ")" | "(" name ")" <subscript>
-<subscript>  -> "_" COEFF
-```
-
-## Terms
-
-Terms are groupings of elements separated by `+`. Each individual term represents a composition of functions.
-
-So, `ABC + D` represents in Lisp-like pseudocode `(A (B (C))) (D)`.
-
-## Elements
-
-Elements are the elemental building block of Esoteric Reaction, representing a function call. Each element has the following three parts:
-
-* Optional coefficient
-* Chemical symbol
-* Optional subscript
-
-### Element Groups
-
-Functions can be assigned an arbitrary name via the `=` operator. They can then use this name to call that snippet of code later. Names must be surrounded by parentheses (as they are a grouping of elements), and can have any non-whitespace, non-`+_()` string of characters.
-
-```lisp
-Co + De = (CoDe) ; definition
-(CoDe) -> CoDe ; call
-3 (CoDe) + H -> 2 CoDe + CoDeH ; call with coefficent
-(CoDe)_3 + H -> 3 CoDe + H ; call with subscript
-```
-
-## Modifiers
-
-Elements and element groups can be 
-
-### Coefficients
-
-Coefficients are syntatic sugar; it represents multiple calls to the function with the same arguments.
-So, `3 H` desugars into `H + H + H`.
-`3 (CNH)` desugars into `CNH + CNH + CNH`.
-
-### Subscripts
-
-Subscripts are a way of differentiating between related functions. Functions without a subscript act upon individual elements on the stack, while subscripted elements take an additional number argument `n` first to act upon `n` elements of the stack.
-
-For example, `H` pops twice and pushes the sum.
-`H_x` pops once to get the number of elements to sum, then pops that many times, then pushes the sum of them all.
-
-Subscripting an element group does the same, where it pops a number `n` and then pops an additional `n` times to pass as arguments to the group.
+## The Virtual Reaction Machine
