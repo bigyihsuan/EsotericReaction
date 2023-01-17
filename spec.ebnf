@@ -1,11 +1,10 @@
-code     = equation | equation code ;
-equation = reagent rhs | COMMENT | reagent rhs COMMENT ;
-rhs      = "=" NAME | "->" reagent ;
-reagent  = term | term "+" reagent ;
-term     = molecule | NUMBER molecule ;
-molecule = atom | atom molecule ;
-atom     = ELEMENT | name "_" NUMBER ;
-NUMBER   = integer > 0 ;
-ELEMENT  = valid element ;
-NAME     = non-whitespace, non-"_+;" string ;
+code = (reaction | definition)*
+definition = ELEMENT ":" reaction ;
+reaction = molecule ("+" molecule)* "->" molecule ("+" molecule)*
+molecule = NUMBER? atom+ ; 
+atom     = ELEMENT | ELEMENT subscript ;
+subscript = "_" NUMBER ;
+
+NUMBER   = "[0-9]+" ;
+ELEMENT  = "[A-Z][a-z]+" ;
 COMMENT  = ";" text "\n" ;

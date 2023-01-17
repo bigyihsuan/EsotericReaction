@@ -41,7 +41,25 @@ Note that this is conservation of *mass*, and not energy.
 
 All 118 known elements are reserved for built-ins.
 
-### Unknown Elements
+### Undiscovered Elements
+
+All elements starting from atomic number 119 and beyond are available as bindable names.
+The rules for what is considered an undiscovered element is as follows:
+
+* The first character is uppercase, while all other characters are lowercase.
+* When converting to an atomic number `x`, satisfies `x >= 119`.
+* Only contains the following characters (from 0-9):
+  * `nubtqphsoe`
+
+To make a name of atomic number `N`, perform the following pseudocode:
+
+```python
+for each digit,
+  map it to its letter value:
+    n -> 0, u -> 1, b -> 2, t -> 3, q -> 4,
+    p -> 5, h -> 6, s -> 7, o -> 8, e -> 9
+capitalize the first letter.
+```
 
 ### Light and Heat
 
@@ -50,6 +68,16 @@ All 118 known elements are reserved for built-ins.
 ## Subscripts
 
 ## Molecules
+
+## Equations
+
+## Naming Equations
+
+```lisp
+Uue: ... ; equation here
+; usage
+ABC + Uue -> AUue + BC ; use like any other element
+```
 
 ## Types
 
