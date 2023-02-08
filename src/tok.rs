@@ -10,6 +10,7 @@ pub enum Token {
     Arrow,
     // literals
     String(String),
+    Number(String),
     // elements
     Light,
     Heat,

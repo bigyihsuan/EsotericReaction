@@ -103,6 +103,21 @@ impl Lexer {
                 }
                 Ok(Token::String(chars))
             }
+            // number literal
+            '0'..='9' => {
+                let mut chars = String::new();
+                chars.push(self.ch);
+                while self.ch.is_digit(10) {
+                    self.read_char()?;
+                    if self.ch.is_digit(10) {
+                        chars.push(self.ch);
+                    } else {
+                        self.put_back()?;
+                        break;
+                    }
+                }
+                Ok(Token::Number(chars))
+            }
             _ => Err(()),
         }
     }
