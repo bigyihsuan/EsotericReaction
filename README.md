@@ -183,6 +183,7 @@ ABC + Uue -> AUue + BC ; use like any other element
 
 | Instruction | Effect                       |
 | ----------- | ---------------------------- |
+| `C_nH_2n+2` | Push new `n`-alkane          |
 |             | Move alkene pointer up       |
 |             | Move alkene pointer down     |
 |             | Add carbon before pointer    |
