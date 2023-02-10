@@ -25,6 +25,7 @@ fn main() {
     let dot_config = [Config::EdgeNoLabel];
 
     let mut alk = Alkane::new();
+
     alk.add_carbon_after();
     alk.add_carbon_before();
     alk.add_carbon_after();
