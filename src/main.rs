@@ -21,14 +21,13 @@ fn main() {
 
     let dot_config = [Config::EdgeNoLabel];
 
-    let mut alk = Alkane::new();
-    let propane = Alkane::new_n_alkane(3);
-
-    alk.add_carbon_after();
-    alk.add_carbon_before();
-    alk.add_carbon_after();
-
-    // alk.add_alkane(propane);
+    let mut alk = Alkane::new_n_alkane(4);
+    let ane = Alkane::new_n_alkane(2);
+    // println!("{:?}", alk.current_atom);
+    alk.move_down();
+    // println!("{:?}", alk.current_atom);
+    alk.move_down();
+    alk.add_alkane(ane);
 
     // println!("{:?}", dot::Dot::with_config(&alk.atoms, &dot_config));
     println!("{:?}", dot::Dot::with_config(&alk.flatten(), &dot_config));

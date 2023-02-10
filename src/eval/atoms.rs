@@ -10,7 +10,7 @@ use petgraph::{
 #[derive(Debug, Clone)]
 pub struct Alkane {
     pub atoms: StableUnGraph<Molecule, ()>,
-    current_atom: NodeIndex,
+    pub current_atom: NodeIndex,
     backbone: VecDeque<NodeIndex>,
 }
 
@@ -139,8 +139,6 @@ impl Alkane {
                 // attach carbon to this
                 self.atoms.add_edge(self.current_atom, carbon, ());
                 self.backbone.push_back(carbon);
-                // move to the new carbon
-                self.current_atom = carbon;
             }
             None => panic!("shouldn't have nothing before an atom"),
         }
@@ -167,7 +165,7 @@ impl Alkane {
         let current_index = self.get_current_atom_index();
         match current_index {
             Some(idx) if idx > 0 => {
-                self.current_atom = *self.backbone.get(idx - 1).unwrap();
+                self.current_atom = *self.backbone.get(idx - 1).unwrap_or(&NodeIndex::default());
                 true
             }
             Some(_) => false,
@@ -178,7 +176,7 @@ impl Alkane {
         let current_index = self.get_current_atom_index();
         match current_index {
             Some(idx) => {
-                self.current_atom = *self.backbone.get(idx + 1).unwrap();
+                self.current_atom = *self.backbone.get(idx + 1).unwrap_or(&NodeIndex::default());
                 true
             }
             None => false,
@@ -248,7 +246,7 @@ impl Alkane {
                             })
                             .collect::<Vec<_>>()
                             .get(0)
-                            .unwrap()
+                            .unwrap_or(&NodeIndex::default())
                             .clone();
                         let old_edge = alk.find_edge(chain_carbon, old_alk_idx);
                         if let Some(old_edge) = old_edge.clone() {
