@@ -25,8 +25,10 @@ fn main() {
     let propane = Alkane::new_n_alkane(3);
 
     alk.add_carbon_after();
-    // alk.add_carbon_before();
+    alk.add_carbon_before();
     alk.add_carbon_after();
+
+    // alk.add_alkane(propane);
 
     // println!("{:?}", dot::Dot::with_config(&alk.atoms, &dot_config));
     println!("{:?}", dot::Dot::with_config(&alk.flatten(), &dot_config));

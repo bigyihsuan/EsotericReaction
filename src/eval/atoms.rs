@@ -4,6 +4,7 @@ use petgraph::{
     data::DataMap,
     graph::Node,
     stable_graph::{NodeIndex, StableUnGraph},
+    visit::IntoNeighbors,
 };
 
 #[derive(Debug, Clone)]
@@ -37,9 +38,37 @@ impl Alkane {
 
     pub fn add_carbon_after(&mut self) {
         let carbon = self.atoms.add_node(Molecule::E(Element::Carbon));
+        if let Some(Molecule::E(Element::AlkaneHeader)) = self.atoms.node_weight(self.current_atom)
+        {
+            // current atom is an alkane header; try to connect the new carbon with the first child
+            if let Some(first_child) = self
+                .atoms
+                .neighbors(self.current_atom)
+                .filter(|neighbor| {
+                    if let Some(&Molecule::E(Element::Carbon)) = self.atoms.node_weight(*neighbor) {
+                        true
+                    } else {
+                        false
+                    }
+                })
+                .collect::<Vec<_>>()
+                .first()
+                .cloned()
+            {
+                // there is a child, put the carbon in between the header and the child
+                self.atoms.add_edge(self.current_atom, carbon, ());
+                self.atoms.add_edge(carbon, first_child, ());
+                let existing_edge = self.atoms.find_edge(self.current_atom, first_child);
+                if let Some(existing_edge) = existing_edge {
+                    self.atoms.remove_edge(existing_edge);
+                }
+                return;
+            }
+            // there is no first child, do the regular thing
+        }
         self.atoms.add_edge(self.current_atom, carbon, ());
         // get the index to add after
-        let current_index = self.get_current_atom_index();
+        let current_index = self.get_atom_index(self.current_atom);
         match current_index {
             Some(idx) => self.backbone.insert(idx + 1, carbon),
             None => self.backbone.push_back(carbon), // can't find the current atom, add to the end
@@ -47,6 +76,36 @@ impl Alkane {
     }
     pub fn add_carbon_before(&mut self) {
         let carbon = self.atoms.add_node(Molecule::E(Element::Carbon));
+
+        if let Some(Molecule::E(Element::AlkaneHeader)) = self.atoms.node_weight(self.current_atom)
+        {
+            // current atom is an alkane header; try to connect the new carbon with the first child
+            if let Some(first_child) = self
+                .atoms
+                .neighbors(self.current_atom)
+                .filter(|neighbor| {
+                    if let Some(&Molecule::E(Element::Carbon)) = self.atoms.node_weight(*neighbor) {
+                        true
+                    } else {
+                        false
+                    }
+                })
+                .collect::<Vec<_>>()
+                .first()
+                .cloned()
+            {
+                // there is a child, put the carbon in between the header and the child
+                self.atoms.add_edge(self.current_atom, carbon, ());
+                self.atoms.add_edge(carbon, first_child, ());
+                let existing_edge = self.atoms.find_edge(self.current_atom, first_child);
+                if let Some(existing_edge) = existing_edge {
+                    self.atoms.remove_edge(existing_edge);
+                }
+                return;
+            }
+            // there is no first child, do the regular thing
+        }
+
         let previous_index = self.get_current_atom_index();
         match previous_index {
             Some(idx) if idx > 0 => {
@@ -126,8 +185,11 @@ impl Alkane {
         }
     }
 
+    fn get_atom_index(&self, target: NodeIndex) -> Option<usize> {
+        self.backbone.iter().position(|e| *e == target)
+    }
     fn get_current_atom_index(&self) -> Option<usize> {
-        self.backbone.iter().position(|e| *e == self.current_atom)
+        self.get_atom_index(self.current_atom)
     }
 
     // recursively flatten this alkane by attaching the nodes of child alkanes to their parent
