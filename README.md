@@ -101,36 +101,23 @@ All bonds in the VRM must follow the octet rule, and other similar rules
 It is considered a runtime error if a molecule invalidates the electron rules.
 Any empty bonds will be filled by a filler hydrogen.
 
-## Types
+## Types and Functional Groups
 
 Types are highly dependent on functional groups.
 Certain functional groups directly attached to an alkane
 determines the type of the functional groups attached to it.
 
-| Type    | Description                                                    |
-| ------- | -------------------------------------------------------------- |
-| None    | Nothing.                                                       |
-| Integer | A simple 64-bit integer.                                       |
-| Boolean | -                                                              |
-| String  | A list of integers, representing UTF8-encoded characters.      |
-| Pair    | A 2-tuple of any two types, including lists, maps, and tuples. |
-| List    | A heterogeneous list of any type.                              |
-| Map     | A heterogenous list of pairs.                                  |
-
-## Functional Groups
-
-Functional groups change the properties of the alkane.
-In the table below, `R` represents the existing alkane chaine,
+In the table below, `R` represents the existing alkane chain,
 and `R'`, `R''`, `R'''`, etc., are other functional groups, or another alkane.
 
-| Type    | Description                                                    | Formula         | Name           | Notes                                                      |
-| ------- | -------------------------------------------------------------- | --------------- | -------------- | ---------------------------------------------------------- |
-| Integer | A simple 64-bit integer.                                       | `ROR'`          | Ether          | The sum of atomic numbers of `R'` is the actual data.      |
-| Boolean | A true or false value.                                         | `RBOR'`         | "Borinic Acid" | `true` if `R'` is non-`H`/non-empty.                       |
-| String  | A list of integers, representing UTF8-encoded characters.      | `RSR'`          | Sulfide        | `R'` must be either nothing/a `H`, or an etherized alkane. |
-| Pair    | A 2-tuple of any two types, including lists, maps, and tuples. | `RNR'R''`       | Tertiary Amine | `R'` is the "key", `R''` is the "value".                   |
-| List    | A heterogeneous list of any type.                              | `C_(n)H_(2n+2)` | Alkane         | Bonds a new alkane with `n` carbons, for a list.           |
-| Map     | A heterogenous list of pairs.                                  | `C_(n)H_(2n+2)` | Alkane         | Bonds a new alkane with `n` carbons, for a map.            |
+| Type    | Description                                                    | Formula          | Name           | Notes                                                      |
+| ------- | -------------------------------------------------------------- | ---------------- | -------------- | ---------------------------------------------------------- |
+| Integer | A simple 64-bit integer.                                       | `ROR'`           | Ether          | The sum of atomic numbers of `R'` is the actual data.      |
+| Boolean | A true or false value.                                         | `RBOR'`          | "Borinic Acid" | `true` if `R'` is non-`H`/non-empty.                       |
+| String  | A list of integers, representing UTF8-encoded characters.      | `RSR'`           | Sulfide        | `R'` must be either nothing/a `H`, or an etherized alkane. |
+| Pair    | A 2-tuple of any two types, including lists, maps, and tuples. | `RNR'R''`        | Tertiary Amine | `R'` is the "key", `R''` is the "value".                   |
+| List    | A heterogeneous list of any type.                              | `RC_(n)H_(2n+1)` | Alkane         | Bonds a new alkane with `n` carbons, for a list.           |
+| Map     | A heterogenous list of pairs.                                  | `RC_(n)H_(2n+1)` | Alkane         | Bonds a new alkane with `n` carbons, for a map.            |
 
 ## Instructions
 
@@ -177,3 +164,4 @@ Like with unary alkane operations, `Li` and `Be` change which carbon is targeted
 
 | Instruction | Effect | Notes |
 | ----------- | ------ | ----- |
+| O           | Add    |       |
