@@ -7,131 +7,22 @@ Esoteric Reaction is a functional/stack-based/concatenative esoteric programming
 * Practice programming in Rust.
 * Write an esolang that looks like chemical equations.
 
-## The Virtual Reaction Machine
-
-The Virtual Reaction Machine is a virtual machine containing a stack of alkanes (acyclic chain/tree hydrocarbon).
-These alkanes which are manipulated upon by the Esoteric Reaction program.
-Each molecule can be read from, written to, modified, etc.
-They form the basis of the data representation in Esoteric reaction.
-
-### Alkanes
-
-Alkanes are the core data structure of an Esoteric Reaction program.
-Each carbon atom in the alkane can have 0-2 functional groups attached to it.
-Empty bond locations on a carbon atom will be filled with filler hydrogen.
-Alkanes can have new, empty carbon atoms attached anywhere.
-
-### Alkane Length
-
-Alkanes are their own arrays and maps.
-Each carbon atom can store 0-4 bonds per atom, depending on the bonded functional groups.
-The length of the longest chain of an alkane is its *capacity*;
-it represents the half maximum number of functional groups that the alkene can hold.
-You cannot attach more functional groups if there are no more empty hydrogens (i.e. fully saturated).
-
-### The Electron Rules: Octet Rule and Other Similar Rules
-
-All bonds in the VRM must follow the octet rule, and other similar rules (duplet rule, 18-electron rule, here collectively called "electron rules") in order to be valid.
-It is considered a runtime error if a molecule invalidates the electron rules.
-Any empty bonds will be filled by a filler hydrogen.
-
-### Functional Groups
-
-Functional groups change the properties of the alkane.
-In the table below, `R` represent sthe existing alkane chaine,
-and `R'`, `R''`, `R'''`, etc., are other functional groups, or another alkane.
-
-| Formula    | Name           | Effect  | Notes                                                      |
-| ---------- | -------------- | ------- | ---------------------------------------------------------- |
-| `RH`       | Hydride        | -       | Does nothing.                                              |
-| `ROR'`     | Ether          | Integer | The sum of atomic numbers of `R'` is the actual data.      |
-| `RB(OH)R'` | Borinic Acid   | Boolean | `true` if `R'` is non-`H`/non-empty.                       |
-| `RSR'`     | Sulfide        | String  | `R'` must be either nothing/a `H`, or an etherized alkane. |
-| `RNR'R''`  | Tertiary Amine | Map     | `R'` is the key, `R''` is the value.                       |
-
-#### Functional Group Examples
-
-"Empty" hydrogens are not shown.
-
-```mermaid
-graph TD
-
-subgraph int118[Integer: 118]
-c118[C] --- o118[O] --- uuo[Uuo]
-end
-```
-
-```mermaid
-graph TD
-subgraph int5 [Integer: 7, in two ways]
-c51[C] --- o51[O] --- i51[N]
-c52[C] --- o52[O] --- c522[C] --- H521[H]
-c522 --- H522[H]
-c522 --- H523[H]
-end
-```
-
-```mermaid
-graph TD
-subgraph int2 [Integer: 2]
-c2[C] --- o2[O] --- he2[He]
-end
-```
-
-```mermaid
-graph TD
-subgraph int1 [Integer: 1]
-c1[C] --- o1[O] --- h1[H]
-end
-```
-
-```mermaid
-graph TD
-
-subgraph arr1 [Array of Ints: 1,2,92,8]
-ca0[C] --- ca1[C] --- ca2[C] --- ca3[C]
-ca0 --- oa0[O]--- ha0[H]
-ca1 --- oa1[O]--- ha1[H] & ha12[H]
-ca2 --- oa2[O]--- ua2[U]
-ca3 --- oa3[O]--- oa32[O]
-end
-```
-
-```mermaid
-graph TB
-subgraph map1 [Map of Int-Bool: 1:true,2:false,92:false,8:true]
-cm0 --- nm0[N] --- om0[O] --- hm0[H] %% 1:true
-nm0[N] --- bm0[B] --- boh0[OH] & bh0[C]
-cm1 --- nm1[N] --- om1[O] --- hm1[He] %% 2:false
-nm1[N] --- bm1[B] --- boh1[OH] & bh1[H]
-cm2 --- nm2[N] --- om2[O] --- um2[U] %% 92:false
-nm2[N] --- bm2[B] --- boh2[OH] & bh2[H]
-nm3[N] --- om3[O] --- om32[O] %% 8:true
-cm3 --- nm3[N] --- bm3[B] --- boh3[OH] & bh3[He]
-cm0[C] --- cm1[C] --- cm2[C] --- cm3[C] %% main chain
-end
-```
-
-```mermaid
-graph TD
-subgraph string [String Hello!]
-%% [72, 101, 108, 108, 111, 33]
-cs5 --- o5[O] --- as[As]
-cs4 --- o4[O] --- rg[Rg]
-cs2 --- o2[O] --- hs0[Hs]
-cs3 --- o3[O] --- hs1[Hs]
-cs1 --- o1[O] --- md[Md]
-cs0 --- o0[O] --- hf[Hf]
-c[C] --- s[S] --- cs0[C] --- cs1[C] --- cs2[C] --- cs3[C] --- cs4[C] --- cs5[C]
-end
-```
-
 ## Programs
+
+### Quick Examples
+
+#### "Hello World!"
+
+```lisp
+; starting with empty alkane tape
+
+```
 
 ### Law of Conservation of Mass
 
 All Esoteric Reaction programs must follow the Law of Conservation of Mass:
-the number of atoms per element on the left side of the `->` must be equal to the number of atoms per element on the right side.
+the number of atoms per element on the left side of the `->`
+must be equal to the number of atoms per element on the right side.
 
 Note that this is conservation of *mass*, and not energy.
 
@@ -177,16 +68,112 @@ Uue: ... ; equation here
 ABC + Uue -> AUue + BC ; use like any other element
 ```
 
+## The Virtual Reaction Machine
+
+The Virtual Reaction Machine is a virtual machine
+containing a singular alkane tape (acyclic chain/tree hydrocarbon).
+The alkane is manipulated upon by the Esoteric Reaction program,
+and can be traversed "up" and "down" the carbons.
+Moving off the alkane is considered as a crash.
+On each carbon, a functional group can be read from, written to, modified, etc.
+This forms the basis of the data representation in Esoteric reaction.
+
+### Alkanes
+
+Alkanes are the core data structure of an Esoteric Reaction program.
+Each carbon atom in the alkane can have 0-4 functional groups attached to it.
+Empty bond locations on a carbon atom will be filled with filler hydrogen.
+Alkanes can have new, empty carbon atoms attached anywhere.
+
+### Alkane Length
+
+Alkanes are their own arrays and maps.
+Each carbon atom can store 0-4 bonds per atom, depending on the bonded functional groups
+and whether the carbon is at the end or in the middle of a molecule.
+The length of the longest chain of an alkane is its *capacity*;
+it represents the half maximum number of functional groups that the alkene can hold.
+You cannot attach more functional groups if there are no more empty hydrogens (i.e. fully saturated).
+
+### The Electron Rules: Octet Rule and Other Similar Rules
+
+All bonds in the VRM must follow the octet rule, and other similar rules
+(duplet rule, 18-electron rule, here collectively called "electron rules") in order to be valid.
+It is considered a runtime error if a molecule invalidates the electron rules.
+Any empty bonds will be filled by a filler hydrogen.
+
+## Types
+
+Types are highly dependent on functional groups.
+Certain functional groups directly attached to an alkane
+determines the type of the functional groups attached to it.
+
+| Type    | Description                                                    |
+| ------- | -------------------------------------------------------------- |
+| None    | Nothing.                                                       |
+| Integer | A simple 64-bit integer.                                       |
+| Boolean | -                                                              |
+| String  | A list of integers, representing UTF8-encoded characters.      |
+| Pair    | A 2-tuple of any two types, including lists, maps, and tuples. |
+| List    | A heterogeneous list of any type.                              |
+| Map     | A heterogenous list of pairs.                                  |
+
+## Functional Groups
+
+Functional groups change the properties of the alkane.
+In the table below, `R` represents the existing alkane chaine,
+and `R'`, `R''`, `R'''`, etc., are other functional groups, or another alkane.
+
+| Type    | Description                                                    | Formula         | Name           | Notes                                                      |
+| ------- | -------------------------------------------------------------- | --------------- | -------------- | ---------------------------------------------------------- |
+| Integer | A simple 64-bit integer.                                       | `ROR'`          | Ether          | The sum of atomic numbers of `R'` is the actual data.      |
+| Boolean | A true or false value.                                         | `RBOR'`         | "Borinic Acid" | `true` if `R'` is non-`H`/non-empty.                       |
+| String  | A list of integers, representing UTF8-encoded characters.      | `RSR'`          | Sulfide        | `R'` must be either nothing/a `H`, or an etherized alkane. |
+| Pair    | A 2-tuple of any two types, including lists, maps, and tuples. | `RNR'R''`       | Tertiary Amine | `R'` is the "key", `R''` is the "value".                   |
+| List    | A heterogeneous list of any type.                              | `C_(n)H_(2n+2)` | Alkane         | Bonds a new alkane with `n` carbons, for a list.           |
+| Map     | A heterogenous list of pairs.                                  | `C_(n)H_(2n+2)` | Alkane         | Bonds a new alkane with `n` carbons, for a map.            |
+
 ## Instructions
 
 ### Alkane Manipulation
 
-| Instruction | Effect                       |
-| ----------- | ---------------------------- |
-| `C_nH_2n+2` | Push new `n`-alkane          |
-|             | Move alkene pointer up       |
-|             | Move alkene pointer down     |
-|             | Add carbon before pointer    |
-|             | Add carbon after pointer     |
-|             | Remove carbon before pointer |
-|             | Remove carbon after pointer  |
+Most instructions regarding manipulating the alkane are alkali and alkali earth metals.
+
+| Instruction | Effect                                                 | Notes                                       |
+| ----------- | ------------------------------------------------------ | ------------------------------------------- |
+| `K`         | Move alkene pointer "up"                               |                                             |
+| `Ca`        | Move alkene pointer "down"                             |                                             |
+| `Na`        | Add carbon at the "top"                                |                                             |
+| `Mg`        | Add carbon at the "bottom"                             |                                             |
+| `Li`        | Add carbon before pointer                              |                                             |
+| `Be`        | Add carbon after pointer                               |                                             |
+| `Rb`        | Remove carbon at the "top"                             | Also discards any bonded functional groups. |
+| `Sr`        | Remove carbon at the "bottom"                          | Also discards any bonded functional groups. |
+| `Cs`        | Remove carbon before pointer                           | Also discards any bonded functional groups. |
+| `Ba`        | Remove carbon after pointer                            | Also discards any bonded functional groups. |
+| `HR`        | Bond functional group `R` to the current carbon of `A` | `n` must fulfill the Electron Rules.        |
+
+### Unary Alkane Operations
+
+Operations on the alkane are highly dependent on both arguments being the same type.
+However, these operations are independent of that, and are mostly noble gases.
+Any instances of `X` can be `Li` or `Be`, for placing the result "above" or "below" the current carbon.
+All functional groups bonded to the current carbon are moved with the carbon.
+
+| Instruction | Effect                        | Notes                                                                                  |
+| ----------- | ----------------------------- | -------------------------------------------------------------------------------------- |
+| `HeX`       | Duplicate the current carbon. |                                                                                        |
+| `NeX`       | Swap the current carbon.      | `X` determines which carbon to swap with. NOP if there is no carbon in that direction. |
+| `ArX`       | Rotate surrounding carbons.   | `X` determines which way to rotate carbons.                                            |
+
+<!-- | `KrX`       |                               |                                                                                        |
+| `XnX`       |                               |                                                                                        |
+| `RdX`       |                               |                                                                                        |
+| `OgX`       |                               |                                                                                        | -->
+
+### Binary Operations
+
+Binary operations on the alkane are highly dependent on the types of the two arguments.
+Like with unary alkane operations, `Li` and `Be` change which carbon is targeted for the second argument.
+
+| Instruction | Effect | Notes |
+| ----------- | ------ | ----- |
