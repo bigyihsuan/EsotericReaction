@@ -113,7 +113,7 @@ and `R'`, `R''`, `R'''`, etc., are other functional groups, or another alkane.
 | Type    | Description                                                    | Formula          | Name           | Notes                                                      |
 | ------- | -------------------------------------------------------------- | ---------------- | -------------- | ---------------------------------------------------------- |
 | Integer | A simple 64-bit integer.                                       | `ROR'`           | Ether          | The sum of atomic numbers of `R'` is the actual data.      |
-| Boolean | A true or false value.                                         | `RBOR'`          | "Borinic Acid" | `true` if `R'` is non-`H`/non-empty.                       |
+| Boolean | A true or false value.                                         | `RB(OH)R'`       | "Borinic Acid" | `true` if `R'` is non-`H`/non-empty.                       |
 | String  | A list of integers, representing UTF8-encoded characters.      | `RSR'`           | Sulfide        | `R'` must be either nothing/a `H`, or an etherized alkane. |
 | Pair    | A 2-tuple of any two types, including lists, maps, and tuples. | `RNR'R''`        | Tertiary Amine | `R'` is the "key", `R''` is the "value".                   |
 | List    | A heterogeneous list of any type.                              | `RC_(n)H_(2n+1)` | Alkane         | Bonds a new alkane with `n` carbons, for a list.           |
@@ -145,6 +145,8 @@ Operations on the alkane are highly dependent on both arguments being the same t
 However, these operations are independent of that, and are mostly noble gases.
 Any instances of `X` can be `Li` or `Be`, for placing the result "above" or "below" the current carbon.
 All functional groups bonded to the current carbon are moved with the carbon.
+
+Unmarked operaions default to the carbon "below" the current one.
 
 | Instruction | Effect                        | Notes                                                                                  |
 | ----------- | ----------------------------- | -------------------------------------------------------------------------------------- |

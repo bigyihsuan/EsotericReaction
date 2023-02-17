@@ -3,9 +3,15 @@ mod lex;
 mod tok;
 mod util;
 
+use eval::value::Valuable;
 use petgraph::dot::{self, Config};
+use petgraph::stable_graph::StableUnGraph;
 
-use crate::eval::atoms::{Alkane, Element, FunctionalGroup, Molecule};
+use crate::eval::alkane::Alkane;
+use crate::eval::atom_like::AtomLike;
+use crate::eval::functional_groups::FunctionalGroup;
+use crate::eval::value::Weighable;
+use crate::eval::{element::Element, molecule::Molecule};
 
 fn main() {
     // let code = r"C_3H_8+5O_2 -> 3CO_2+4H_2O".to_string();
@@ -23,13 +29,18 @@ fn main() {
 
     let mut alk = Alkane::new_n_alkane(4);
     let ane = Alkane::new_n_alkane(2);
-    // println!("{:?}", alk.current_atom);
     alk.move_down();
-    // println!("{:?}", alk.current_atom);
     alk.move_down();
     alk.add_alkane(ane);
+    let eth = FunctionalGroup::new_ether(Molecule::E(Element::N));
+    let bor = FunctionalGroup::new_borinic_acid(Molecule::Fg(eth.clone()));
+    alk.move_down();
+    alk.add_functional_group(bor.clone());
 
-    // println!("{:?}", dot::Dot::with_config(&alk.atoms, &dot_config));
-    println!("{:?}", dot::Dot::with_config(&alk.flatten(), &dot_config));
-    // alk.move_up()
+    dbg!(&eth.value());
+    dbg!(&bor.value());
+    // println!(
+    //     "{:?}",
+    //     dot::Dot::with_config(&alk.flatten().atoms(), &dot_config)
+    // );
 }
