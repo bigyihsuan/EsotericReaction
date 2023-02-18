@@ -4,7 +4,7 @@
 // }
 
 use super::{
-    alkane::Alkane, element::Element, functional_groups::FunctionalGroup, value::Weighable,
+    element::Element, functional_groups::FunctionalGroup, value::Weighable,
 };
 
 #[derive(Debug, Clone)]

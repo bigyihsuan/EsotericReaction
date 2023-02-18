@@ -99,11 +99,11 @@ impl AtomLike for FunctionalGroup {
         }
     }
 
-    fn add_node(&mut self, m: Molecule) -> NodeIndex {
+    fn add_node(&mut self, _m: Molecule) -> NodeIndex {
         todo!()
     }
 
-    fn add_edge(&mut self, m: NodeIndex, n: NodeIndex) -> EdgeIndex {
+    fn add_edge(&mut self, _m: NodeIndex, _n: NodeIndex) -> EdgeIndex {
         todo!()
     }
 }
@@ -123,11 +123,11 @@ impl Valuable for FunctionalGroup {
 impl Weighable for FunctionalGroup {
     fn atomic_weight(&self) -> i64 {
         match self {
-            Self::Alkane(alk) => todo!(),
+            Self::Alkane(_alk) => todo!(),
             Self::Ether(eth) => eth.atomic_weight(),
             Self::BorinicAcid(bor) => bor.atomic_weight(),
-            Self::Sulfide(sulf) => todo!(),
-            Self::Amine(am) => todo!(),
+            Self::Sulfide(_sulf) => todo!(),
+            Self::Amine(_am) => todo!(),
         }
     }
 }
