@@ -23,7 +23,7 @@ impl FgElement {
     pub fn as_molecule(&self) -> Molecule {
         match self {
             FgElement::E(e) => Molecule::E(e.to_owned()),
-            FgElement::F(f) => Molecule::Fg(f.to_owned()),
+            FgElement::F(f) => Molecule::F(f.to_owned()),
         }
     }
 }
@@ -61,11 +61,7 @@ impl FunctionalGroup {
         Self::BorinicAcid(BorinicAcid(atoms))
     }
     pub fn new_sulfide(r: FgElement) -> Self {
-        let mut atoms = Atoms::new();
-        let s = atoms.add_node(Molecule::E(Element::S));
-        let r = atoms.add_node(r.as_molecule());
-        atoms.add_edge(s, r);
-        Self::Sulfide(Sulfide(atoms))
+        Self::Sulfide(Sulfide::new_with(r))
     }
     pub fn new_amine(r1: FgElement, r2: FgElement) -> Self {
         let mut atoms = Atoms::new();
@@ -129,13 +125,13 @@ impl AtomLike for FunctionalGroup {
 }
 
 impl Weighable for FunctionalGroup {
-    fn atomic_weight(&self) -> i64 {
+    fn atomic_numbers(&self) -> i64 {
         match self {
-            Self::Alkane(alk) => alk.atomic_weight(),
-            Self::Ether(eth) => eth.atomic_weight(),
-            Self::BorinicAcid(bor) => bor.atomic_weight(),
-            Self::Sulfide(sulf) => sulf.atomic_weight(),
-            Self::Amine(am) => am.atomic_weight(),
+            Self::Alkane(alk) => alk.atomic_numbers(),
+            Self::Ether(eth) => eth.atomic_numbers(),
+            Self::BorinicAcid(bor) => bor.atomic_numbers(),
+            Self::Sulfide(sulf) => sulf.atomic_numbers(),
+            Self::Amine(am) => am.atomic_numbers(),
         }
     }
 }

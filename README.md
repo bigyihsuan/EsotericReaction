@@ -14,8 +14,8 @@ Esoteric Reaction is a functional/stack-based/concatenative esoteric programming
 #### "Hello World!"
 
 ```lisp
-; starting with empty alkane tape
-
+; starting with alkane with a single carbon
+HS"Hello, World!" + Xn -> XnSH
 ```
 
 ### Law of Conservation of Mass
@@ -110,14 +110,14 @@ determines the type of the functional groups attached to it.
 In the table below, `R` represents the existing alkane chain,
 and `R'`, `R''`, `R'''`, etc., are other functional groups, or another alkane.
 
-| Type    | Description                                                             | Formula          | Name           | Notes                                                      |
-| ------- | ----------------------------------------------------------------------- | ---------------- | -------------- | ---------------------------------------------------------- |
-| Integer | A simple 64-bit integer.                                                | `ROR'`           | Ether          | The sum of atomic numbers of `R'` is the actual data.      |
-| Boolean | A true or false value.                                                  | `RB(OH)R'`       | "Borinic Acid" | `true` if `R'` is non-`H`/non-empty.                       |
-| String  | A list of integers, with each integer representing Unicode code points. | `RSR'`           | Sulfide        | `R'` must be either nothing/a `H`, or an etherized alkane. |
-| Pair    | A 2-tuple of any two types, including lists, maps, and tuples.          | `RNR'R''`        | Tertiary Amine | `R'` is the "key", `R''` is the "value".                   |
-| List    | A heterogeneous list of any type.                                       | `RC_(n)H_(2n+1)` | Alkane         | Bonds a new alkane with `n` carbons, for a list.           |
-| Map     | A heterogenous list of pairs.                                           | `RC_(n)H_(2n+1)` | Alkane         | Bonds a new alkane with `n` carbons, for a map.            |
+| Type    | Description                                                                | Formula          | Name           | Notes                                                      |
+| ------- | -------------------------------------------------------------------------- | ---------------- | -------------- | ---------------------------------------------------------- |
+| Integer | A simple 64-bit integer.                                                   | `HOR'`           | Ether          | The sum of atomic numbers of `R'` is the actual data.      |
+| Boolean | A true or false value.                                                     | `HB(OH)R'`       | "Borinic Acid" | `true` if `R'` is non-`H`/non-empty.                       |
+| String  | A list of integers, with each integer representing a Unicode Scalar Value. | `HSR'`           | Sulfide        | `R'` must be either nothing/a `H`, or an etherized alkane. |
+| Pair    | A 2-tuple of any two types, including lists, maps, and tuples.             | `HNR'R''`        | Tertiary Amine | `R'` is the "key", `R''` is the "value".                   |
+| List    | A heterogeneous list of any type.                                          | `HC_(n)H_(2n+1)` | Alkane         | Bonds a new alkane with `n` carbons, for a list.           |
+| Map     | A heterogenous list of pairs.                                              | `HC_(n)H_(2n+1)` | Alkane         | Bonds a new alkane with `n` carbons, for a map.            |
 
 ## Instructions
 
@@ -137,7 +137,7 @@ Most instructions regarding manipulating the alkane are alkali and alkali earth 
 | `Sr`        | Remove carbon at the "bottom"                          | Also discards any bonded functional groups. |
 | `Cs`        | Remove carbon before pointer                           | Also discards any bonded functional groups. |
 | `Ba`        | Remove carbon after pointer                            | Also discards any bonded functional groups. |
-| `HR`        | Bond functional group `R` to the current carbon of `A` | `n` must fulfill the Electron Rules.        |
+| `HR`        | Bond functional group `R` to the current carbon of `A` |                                             |
 
 ### Unary Alkane Operations
 
@@ -148,22 +148,45 @@ All functional groups bonded to the current carbon are moved with the carbon.
 
 Unmarked operaions default to the carbon "below" the current one.
 
-| Instruction | Effect                        | Notes                                                                                  |
-| ----------- | ----------------------------- | -------------------------------------------------------------------------------------- |
-| `HeX`       | Duplicate the current carbon. |                                                                                        |
-| `NeX`       | Swap the current carbon.      | `X` determines which carbon to swap with. NOP if there is no carbon in that direction. |
-| `ArX`       | Rotate surrounding carbons.   | `X` determines which way to rotate carbons.                                            |
-
-<!-- | `KrX`       |                               |                                                                                        |
-| `XnX`       |                               |                                                                                        |
-| `RdX`       |                               |                                                                                        |
-| `OgX`       |                               |                                                                                        | -->
+| Instruction | Effect                                                | Notes                                                                                  |
+| ----------- | ----------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| `HeX`       | Duplicate the current carbon.                         |                                                                                        |
+| `NeX`       | Swap the current carbon.                              | `X` determines which carbon to swap with. NOP if there is no carbon in that direction. |
+| `ArX`       | Rotate surrounding carbons.                           | `X` determines which way to rotate carbons.                                            |
+| `Kr`        | Print the values of the groups bonded to this carbon. | No trailing newline.                                                                   |
+| `Xn`        | Print the values of the groups bonded to this carbon. | With trailing newline. Each group is separated by newlines.                            |
+| `RdX`       |                                                       |                                                                                        |
+| `OgX`       |                                                       |                                                                                        |
 
 ### Binary Operations
 
 Binary operations on the alkane are highly dependent on the types of the two arguments.
-Like with unary alkane operations, `Li` and `Be` change which carbon is targeted for the second argument.
+Like with unary alkane operations, any `X` can be replaced with `Li` and `Be`
+to change which carbon is targeted for the second argument.
 
-| Instruction | Effect | Notes |
-| ----------- | ------ | ----- |
-| O           | Add    |       |
+| Instruction | Effect   | Notes                                                                                           |
+| ----------- | -------- | ----------------------------------------------------------------------------------------------- |
+| `Al`        | Add      |                                                                                                 |
+| `Si`        | Subtract |                                                                                                 |
+| `Mn`        | Multiply |                                                                                                 |
+| `Db`        | Divide   |                                                                                                 |
+| `Mo`        | Modulo   |                                                                                                 |
+| `In`        | Index    | Current functional group must be String, Pair, or List. Other functional group must be Integer. |
+| `Pd`        | Append   | Current functional group must be String, Pair, or List.                                         |
+| `Ge`        | Get      | Current functional group must be Map.                                                           |
+
+#### Binary Operations Type Charts
+
+Types in parentheses `(type)` are the second argument.
+
+| Op  | Integer       | Boolean | String         | Pair              | List              | Map             |
+| --- | ------------- | ------- | -------------- | ----------------- | ----------------- | --------------- |
+| Add | Addition      | And     | Concat         |                   | Concat            | Concat          |
+| Sub | Subtraction   | Or      | Difference     |                   | Difference        | Difference      |
+| Mul | Multiplcation | Xor     | (Int) Repeat   |                   | (Int) Repeat      |                 |
+| Div | Division      |         |                |                   |                   |                 |
+| Mod | Modulo        |         |                |                   |                   |                 |
+| Idx |               |         | (Int) Get Char | (Int) Get Element | (Int) Get Element |                 |
+| App |               |         |                |                   |                   |                 |
+| Get |               |         |                |                   |                   | (key) Get Value |
+|     |               |         |                |                   |                   |                 |

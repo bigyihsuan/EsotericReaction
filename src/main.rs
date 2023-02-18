@@ -10,6 +10,7 @@ use petgraph::dot::{self, Config};
 use crate::eval::alkane::Alkane;
 use crate::eval::atom_like::AtomLike;
 use crate::eval::functional_groups::amine::Amine;
+use crate::eval::functional_groups::sulfide::Sulfide;
 use crate::eval::functional_groups::{FgElement, FunctionalGroup};
 use crate::eval::{element::Element, molecule::Molecule};
 
@@ -40,39 +41,43 @@ fn main() {
     // dbg!(&eth.value());
     // dbg!(&bor.value());
 
-    let h = FunctionalGroup::new_ether(FgElement::E(Element::Hf));
-    let e = FunctionalGroup::new_ether(FgElement::E(Element::Md));
-    let l = FunctionalGroup::new_ether(FgElement::E(Element::Hs));
-    let o = FunctionalGroup::new_ether(FgElement::E(Element::Rg));
+    // let h = FunctionalGroup::new_ether(FgElement::E(Element::Hf));
+    // let e = FunctionalGroup::new_ether(FgElement::E(Element::Md));
+    // let l = FunctionalGroup::new_ether(FgElement::E(Element::Hs));
+    // let o = FunctionalGroup::new_ether(FgElement::E(Element::Rg));
 
-    let alk = Alkane::new_with(vec![
-        AlkaneElement::F(h.clone()),
-        AlkaneElement::F(e.clone()),
-        AlkaneElement::F(l.clone()),
-        AlkaneElement::F(l.clone()),
-        AlkaneElement::F(o.clone()),
-    ]);
+    // let alk = Alkane::new_with(vec![
+    //     AlkaneElement::F(h.clone()),
+    //     AlkaneElement::F(e.clone()),
+    //     AlkaneElement::F(l.clone()),
+    //     AlkaneElement::F(l.clone()),
+    //     AlkaneElement::F(o.clone()),
+    // ]);
 
-    let hello = FunctionalGroup::new_sulfide(FgElement::F(FunctionalGroup::Alkane(alk)));
-    let six = FunctionalGroup::new_ether(FgElement::E(Element::C));
+    // let hello = FunctionalGroup::new_sulfide(FgElement::F(FunctionalGroup::Alkane(alk)));
+    // let six = FunctionalGroup::new_ether(FgElement::E(Element::C));
 
-    let alk2 = Alkane::new_with(vec![
-        AlkaneElement::F(l.clone()),
-        AlkaneElement::F(o.clone()),
-        AlkaneElement::F(l.clone()),
-    ]);
-    let hell = FunctionalGroup::new_sulfide(FgElement::F(FunctionalGroup::Alkane(alk2)));
+    // let alk2 = Alkane::new_with(vec![
+    //     AlkaneElement::F(l.clone()),
+    //     AlkaneElement::F(o.clone()),
+    //     AlkaneElement::F(l.clone()),
+    // ]);
+    // let hell = FunctionalGroup::new_sulfide(FgElement::F(FunctionalGroup::Alkane(alk2)));
 
-    let one = FunctionalGroup::new_ether(FgElement::E(Element::H));
-    let three = FunctionalGroup::new_ether(FgElement::E(Element::Li));
-    let three_one = FunctionalGroup::new_amine(FgElement::F(three), FgElement::F(one));
-    let hell_pair = FunctionalGroup::new_amine(FgElement::F(hell), FgElement::F(three_one));
+    // let one = FunctionalGroup::new_ether(FgElement::E(Element::H));
+    // let three = FunctionalGroup::new_ether(FgElement::E(Element::Li));
+    // let three_one = FunctionalGroup::new_amine(FgElement::F(three), FgElement::F(one));
+    // let hell_pair = FunctionalGroup::new_amine(FgElement::F(hell), FgElement::F(three_one));
 
-    let amine = FunctionalGroup::new_amine(FgElement::F(six), FgElement::F(hello));
-    let nested_amine = FunctionalGroup::new_amine(FgElement::F(amine), FgElement::F(hell_pair));
-    dbg!(&nested_amine.value());
+    // let amine = FunctionalGroup::new_amine(FgElement::F(six), FgElement::F(hello));
+    // let nested_amine = FunctionalGroup::new_amine(FgElement::F(amine), FgElement::F(hell_pair));
+    // dbg!(&nested_amine.value());
+
+    let s = "Hello, world!東京";
+    let sulfide = Sulfide::from(s);
+    dbg!(&sulfide.value());
     println!(
         "{:?}",
-        dot::Dot::with_config(&nested_amine.flatten().atoms(), &dot_config)
+        dot::Dot::with_config(&sulfide.flatten().atoms(), &dot_config)
     );
 }

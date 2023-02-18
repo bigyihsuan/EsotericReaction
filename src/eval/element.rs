@@ -2,6 +2,8 @@ use std::fmt::{Debug, Display};
 
 use super::value::Weighable;
 
+const HEAVY_LETTERS: &str = "nubtqphsoe";
+
 #[derive(Clone)]
 pub enum Element {
     Heavy(String),
@@ -378,9 +380,8 @@ impl Display for Element {
 }
 
 impl Weighable for Element {
-    fn atomic_weight(&self) -> i64 {
+    fn atomic_numbers(&self) -> i64 {
         match self {
-            Element::Heavy(_) => todo!("atomic weight: parse everything pase 119"),
             Element::H => 1,
             Element::He => 2,
             Element::Li => 3,
@@ -499,6 +500,176 @@ impl Weighable for Element {
             Element::Lv => 116,
             Element::Ts => 117,
             Element::Og => 118,
+            Element::Heavy(s) => {
+                s
+                    // lowercase the string
+                    .to_lowercase()
+                    .chars()
+                    // map each char to a digit
+                    .map(|c| format!("{}", HEAVY_LETTERS.find(|d| d == c).unwrap()))
+                    .collect::<String>()
+                    // parse into an int
+                    .parse::<i64>()
+                    .unwrap()
+            }
         }
     }
 }
+
+impl Element {}
+
+macro_rules! from_for_element {
+    ($t:ty) => {
+        impl From<$t> for Element {
+            fn from(n: $t) -> Element {
+                match n {
+                    1 => Element::H,
+                    2 => Element::He,
+                    3 => Element::Li,
+                    4 => Element::Be,
+                    5 => Element::B,
+                    6 => Element::C,
+                    7 => Element::N,
+                    8 => Element::O,
+                    9 => Element::F,
+                    10 => Element::Ne,
+                    11 => Element::Na,
+                    12 => Element::Mg,
+                    13 => Element::Al,
+                    14 => Element::Si,
+                    15 => Element::P,
+                    16 => Element::S,
+                    17 => Element::Cl,
+                    18 => Element::Ar,
+                    19 => Element::K,
+                    20 => Element::Ca,
+                    21 => Element::Sc,
+                    22 => Element::Ti,
+                    23 => Element::V,
+                    24 => Element::Cr,
+                    25 => Element::Mn,
+                    26 => Element::Fe,
+                    27 => Element::Co,
+                    28 => Element::Ni,
+                    29 => Element::Cu,
+                    30 => Element::Zn,
+                    31 => Element::Ga,
+                    32 => Element::Ge,
+                    33 => Element::As,
+                    34 => Element::Se,
+                    35 => Element::Br,
+                    36 => Element::Kr,
+                    37 => Element::Rb,
+                    38 => Element::Sr,
+                    39 => Element::Y,
+                    40 => Element::Zr,
+                    41 => Element::Nb,
+                    42 => Element::Mo,
+                    43 => Element::Tc,
+                    44 => Element::Ru,
+                    45 => Element::Rh,
+                    46 => Element::Pd,
+                    47 => Element::Ag,
+                    48 => Element::Cd,
+                    49 => Element::In,
+                    50 => Element::Sn,
+                    51 => Element::Sb,
+                    52 => Element::Te,
+                    53 => Element::I,
+                    54 => Element::Xe,
+                    55 => Element::Cs,
+                    56 => Element::Ba,
+                    57 => Element::La,
+                    58 => Element::Ce,
+                    59 => Element::Pr,
+                    60 => Element::Nd,
+                    61 => Element::Pm,
+                    62 => Element::Sm,
+                    63 => Element::Eu,
+                    64 => Element::Gd,
+                    65 => Element::Tb,
+                    66 => Element::Dy,
+                    67 => Element::Ho,
+                    68 => Element::Er,
+                    69 => Element::Tm,
+                    70 => Element::Yb,
+                    71 => Element::Lu,
+                    72 => Element::Hf,
+                    73 => Element::Ta,
+                    74 => Element::W,
+                    75 => Element::Re,
+                    76 => Element::Os,
+                    77 => Element::Ir,
+                    78 => Element::Pt,
+                    79 => Element::Au,
+                    80 => Element::Hg,
+                    81 => Element::Tl,
+                    82 => Element::Pb,
+                    83 => Element::Bi,
+                    84 => Element::Po,
+                    85 => Element::At,
+                    86 => Element::Rn,
+                    87 => Element::Fr,
+                    88 => Element::Ra,
+                    89 => Element::Ac,
+                    90 => Element::Th,
+                    91 => Element::Pa,
+                    92 => Element::U,
+                    93 => Element::Np,
+                    94 => Element::Pu,
+                    95 => Element::Am,
+                    96 => Element::Cm,
+                    97 => Element::Bk,
+                    98 => Element::Cf,
+                    99 => Element::Es,
+                    100 => Element::Fm,
+                    101 => Element::Md,
+                    102 => Element::No,
+                    103 => Element::Lr,
+                    104 => Element::Rf,
+                    105 => Element::Db,
+                    106 => Element::Sg,
+                    107 => Element::Bh,
+                    108 => Element::Hs,
+                    109 => Element::Mt,
+                    110 => Element::Ds,
+                    111 => Element::Rg,
+                    112 => Element::Cn,
+                    113 => Element::Nh,
+                    114 => Element::Fl,
+                    115 => Element::Mc,
+                    116 => Element::Lv,
+                    117 => Element::Ts,
+                    118 => Element::Og,
+                    n => {
+                        let n_str = n.to_string();
+                        let mut digits = n_str
+                            .chars()
+                            // get digits
+                            .map(|d| d.to_digit(10).unwrap())
+                            // map digit to letter
+                            .map(|d| {
+                                HEAVY_LETTERS
+                                    .chars()
+                                    .nth(d as usize)
+                                    .unwrap_or(char::REPLACEMENT_CHARACTER)
+                            });
+                        let heavy = digits
+                            .next()
+                            .map(|first_letter| first_letter.to_uppercase())
+                            .into_iter()
+                            .flatten()
+                            .chain(digits)
+                            .collect::<String>();
+                        Element::Heavy(heavy)
+                    }
+                }
+            }
+        }
+    };
+}
+
+from_for_element!(u8);
+from_for_element!(u16);
+from_for_element!(u32);
+from_for_element!(u64);

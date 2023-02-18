@@ -2,10 +2,9 @@ use std::collections::HashMap;
 
 #[derive(Debug, Clone)]
 pub enum Value {
-    None,
     Number(i64),
     Boolean(bool),
-    String(Vec<u8>),
+    String(Vec<char>),
     Pair((Box<Value>, Box<Value>)),
     List(Vec<Box<Value>>),
     Map(HashMap<Box<Value>, Box<Value>>),
@@ -16,5 +15,5 @@ pub trait Valuable {
 }
 
 pub trait Weighable {
-    fn atomic_weight(&self) -> i64;
+    fn atomic_numbers(&self) -> i64;
 }

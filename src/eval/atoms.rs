@@ -45,7 +45,7 @@ impl AtomLike for Atoms {
             for neighbor_idx in self.atoms.neighbors(node_idx) {
                 let neighbor = self.atoms.node_weight(neighbor_idx);
                 // recursively flatten non-elemental molecules
-                if let Some(Molecule::Fg(fg)) = &neighbor {
+                if let Some(Molecule::F(fg)) = &neighbor {
                     let child = fg.flatten();
                     let mut child_to_parent_indexes: HashMap<NodeIndex, NodeIndex> = HashMap::new();
                     // for each atom in the child, add it to the parent's graph

@@ -111,13 +111,13 @@ impl Alkane {
         self.chain.add_edge(self.current_atom, e);
     }
     pub fn add_functional_group(&mut self, f: FunctionalGroup) {
-        let f = self.chain.mut_atoms().add_node(Molecule::Fg(f));
+        let f = self.chain.mut_atoms().add_node(Molecule::F(f));
         self.chain.add_edge(self.current_atom, f);
     }
     pub fn add_alkane(&mut self, alk: Alkane) {
         let a = self
             .chain
-            .add_node(Molecule::Fg(FunctionalGroup::Alkane(alk)));
+            .add_node(Molecule::F(FunctionalGroup::Alkane(alk)));
         self.chain.add_edge(self.current_atom, a);
     }
 
@@ -207,7 +207,7 @@ impl AtomLike for Alkane {
 }
 
 impl Weighable for Alkane {
-    fn atomic_weight(&self) -> i64 {
+    fn atomic_numbers(&self) -> i64 {
         self.chain
             .atoms()
             .neighbors(self.chain.head)
@@ -216,7 +216,7 @@ impl Weighable for Alkane {
                     .atoms()
                     .node_weight(neighbor)
                     .unwrap()
-                    .atomic_weight()
+                    .atomic_numbers()
             })
             .sum()
     }

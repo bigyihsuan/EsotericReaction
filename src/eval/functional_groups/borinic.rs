@@ -33,12 +33,18 @@ impl AtomLike for BorinicAcid {
 }
 
 impl Weighable for BorinicAcid {
-    fn atomic_weight(&self) -> i64 {
+    fn atomic_numbers(&self) -> i64 {
         let atoms = &self.0;
         atoms
             .atoms()
             .neighbors(atoms.head)
-            .map(|neighbor| atoms.atoms().node_weight(neighbor).unwrap().atomic_weight())
+            .map(|neighbor| {
+                atoms
+                    .atoms()
+                    .node_weight(neighbor)
+                    .unwrap()
+                    .atomic_numbers()
+            })
             .sum()
     }
 }
