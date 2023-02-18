@@ -1,3 +1,4 @@
+use std::collections::vec_deque::Iter;
 use std::collections::VecDeque;
 
 use petgraph::stable_graph::{EdgeIndex, NodeIndex};
@@ -8,6 +9,13 @@ use super::atoms::Atoms;
 use super::element::{Element, ElementHeader};
 use super::functional_groups::FunctionalGroup;
 use super::molecule::Molecule;
+
+#[derive(Debug, Clone)]
+pub enum AlkaneElement {
+    E(Element),
+    M(Molecule),
+    F(FunctionalGroup),
+}
 
 #[derive(Debug, Clone)]
 pub struct Alkane {
@@ -208,28 +216,64 @@ impl Alkane {
         }
     }
 
+    pub fn fill(&mut self, stuff: Vec<AlkaneElement>) {
+        let old_current = self.current_atom.clone();
+        // go to the head
+        self.current_atom = *self.backbone.front().unwrap_or(&NodeIndex::default());
+        // start attaching molecules
+        for e in stuff {
+            let e = e.clone();
+            match e {
+                AlkaneElement::E(e) => self.add_element(e),
+                AlkaneElement::M(m) => self.add_molecule(m),
+                AlkaneElement::F(f) => self.add_functional_group(f),
+            }
+            self.move_down();
+        }
+        self.current_atom = old_current
+    }
+
     fn get_atom_index(&self, target: NodeIndex) -> Option<usize> {
         self.backbone.iter().position(|e| *e == target)
     }
     fn get_current_atom_index(&self) -> Option<usize> {
         self.get_atom_index(self.current_atom)
     }
-    fn get_bonded_molecules(&self) -> Vec<&Molecule> {
+    pub fn get_currently_bonded_molecules(&self) -> Vec<&Molecule> {
+        self.get_bonded_molecules(self.current_atom)
+    }
+    pub fn get_bonded_molecules(&self, idx: NodeIndex) -> Vec<&Molecule> {
         self.chain
             .atoms()
-            .neighbors(self.current_atom)
-            .map(|neighbor| self.chain.atoms().node_weight(neighbor).unwrap())
+            .neighbors(idx)
+            .filter_map(|neighbor| {
+                self.chain
+                    .atoms()
+                    .node_weight(neighbor)
+                    .filter(|_| !self.backbone.contains(&neighbor))
+            })
             .collect()
+    }
+    pub fn backbone(&self) -> Iter<NodeIndex> {
+        self.backbone.iter()
     }
 }
 
 impl AtomLike for Alkane {
+    fn get_atoms(&self) -> &Atoms {
+        &self.chain
+    }
+    fn get_atoms_mut(&mut self) -> &mut Atoms {
+        &mut self.chain
+    }
     fn flatten(&self) -> Atoms {
         self.chain.flatten()
     }
+
     fn add_node(&mut self, m: Molecule) -> NodeIndex {
         self.chain.add_node(m)
     }
+
     fn add_edge(&mut self, m: NodeIndex, n: NodeIndex) -> EdgeIndex {
         self.chain.add_edge(m, n)
     }

@@ -110,14 +110,14 @@ determines the type of the functional groups attached to it.
 In the table below, `R` represents the existing alkane chain,
 and `R'`, `R''`, `R'''`, etc., are other functional groups, or another alkane.
 
-| Type    | Description                                                    | Formula          | Name           | Notes                                                      |
-| ------- | -------------------------------------------------------------- | ---------------- | -------------- | ---------------------------------------------------------- |
-| Integer | A simple 64-bit integer.                                       | `ROR'`           | Ether          | The sum of atomic numbers of `R'` is the actual data.      |
-| Boolean | A true or false value.                                         | `RB(OH)R'`       | "Borinic Acid" | `true` if `R'` is non-`H`/non-empty.                       |
-| String  | A list of integers, representing UTF8-encoded characters.      | `RSR'`           | Sulfide        | `R'` must be either nothing/a `H`, or an etherized alkane. |
-| Pair    | A 2-tuple of any two types, including lists, maps, and tuples. | `RNR'R''`        | Tertiary Amine | `R'` is the "key", `R''` is the "value".                   |
-| List    | A heterogeneous list of any type.                              | `RC_(n)H_(2n+1)` | Alkane         | Bonds a new alkane with `n` carbons, for a list.           |
-| Map     | A heterogenous list of pairs.                                  | `RC_(n)H_(2n+1)` | Alkane         | Bonds a new alkane with `n` carbons, for a map.            |
+| Type    | Description                                                             | Formula          | Name           | Notes                                                      |
+| ------- | ----------------------------------------------------------------------- | ---------------- | -------------- | ---------------------------------------------------------- |
+| Integer | A simple 64-bit integer.                                                | `ROR'`           | Ether          | The sum of atomic numbers of `R'` is the actual data.      |
+| Boolean | A true or false value.                                                  | `RB(OH)R'`       | "Borinic Acid" | `true` if `R'` is non-`H`/non-empty.                       |
+| String  | A list of integers, with each integer representing Unicode code points. | `RSR'`           | Sulfide        | `R'` must be either nothing/a `H`, or an etherized alkane. |
+| Pair    | A 2-tuple of any two types, including lists, maps, and tuples.          | `RNR'R''`        | Tertiary Amine | `R'` is the "key", `R''` is the "value".                   |
+| List    | A heterogeneous list of any type.                                       | `RC_(n)H_(2n+1)` | Alkane         | Bonds a new alkane with `n` carbons, for a list.           |
+| Map     | A heterogenous list of pairs.                                           | `RC_(n)H_(2n+1)` | Alkane         | Bonds a new alkane with `n` carbons, for a map.            |
 
 ## Instructions
 

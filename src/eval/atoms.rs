@@ -29,13 +29,21 @@ impl Atoms {
 }
 
 impl AtomLike for Atoms {
+    fn get_atoms(&self) -> &Atoms {
+        &self
+    }
+
+    fn get_atoms_mut(&mut self) -> &mut Atoms {
+        self
+    }
+
     // recursively flatten this group of atoms by attaching the nodes of child molecules to their parent
     fn flatten(&self) -> Atoms {
         let mut flattened_atoms = self.clone();
         for node_idx in self.atoms.node_indices() {
             // for each neighbor...
             for neighbor_idx in self.atoms.neighbors(node_idx) {
-                let neighbor = flattened_atoms.atoms.node_weight(neighbor_idx);
+                let neighbor = self.atoms.node_weight(neighbor_idx);
                 // recursively flatten non-elemental molecules
                 if let Some(Molecule::Fg(fg)) = &neighbor {
                     let child = fg.flatten();

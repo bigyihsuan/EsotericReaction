@@ -4,7 +4,7 @@ use std::collections::HashMap;
 pub enum Value {
     Number(i64),
     Boolean(bool),
-    String(Vec<char>),
+    String(Vec<u8>),
     Pair((Box<Value>, Box<Value>)),
     List(Vec<Box<Value>>),
     Map(HashMap<Box<Value>, Box<Value>>),
