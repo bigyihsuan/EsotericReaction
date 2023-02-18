@@ -8,16 +8,28 @@ use crate::eval::{
 };
 
 #[derive(Debug, Clone)]
-pub struct Ether(pub Atoms);
+pub struct Amine(pub Atoms);
 
-impl Valuable for Ether {
+impl Valuable for Amine {
     fn value(&self) -> Value {
-        // get the sum of the atomic numbers
-        Value::Number(self.atomic_weight())
+        // turn this into a pair
+        // the smaller-indexed molecule is the first of the pair
+        // the larger-indexed molecule is the second of the pair
+        let molecules: Vec<&Molecule> = self
+            .0
+            .atoms()
+            .neighbors(self.0.head)
+            .map(|atom| self.0.atoms().node_weight(atom).unwrap())
+            .collect();
+        let Some(Molecule::Fg(p1)) = molecules.first() else {panic!("failed to get first of pair")};
+        let Some(Molecule::Fg(p2)) = molecules.last() else {panic!("failed to get second of pair")};
+        let p1 = p1.value();
+        let p2 = p2.value();
+        Value::Pair((Box::new(p1), Box::new(p2)))
     }
 }
 
-impl AtomLike for Ether {
+impl AtomLike for Amine {
     fn get_atoms(&self) -> &Atoms {
         &self.0
     }
@@ -39,7 +51,7 @@ impl AtomLike for Ether {
     }
 }
 
-impl Weighable for Ether {
+impl Weighable for Amine {
     fn atomic_weight(&self) -> i64 {
         let atoms = &self.0;
         atoms

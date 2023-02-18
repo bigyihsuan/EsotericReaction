@@ -2,6 +2,7 @@ use std::collections::HashMap;
 
 #[derive(Debug, Clone)]
 pub enum Value {
+    None,
     Number(i64),
     Boolean(bool),
     String(Vec<u8>),

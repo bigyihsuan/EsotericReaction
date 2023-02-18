@@ -9,7 +9,8 @@ use petgraph::dot::{self, Config};
 
 use crate::eval::alkane::Alkane;
 use crate::eval::atom_like::AtomLike;
-use crate::eval::functional_groups::FunctionalGroup;
+use crate::eval::functional_groups::amine::Amine;
+use crate::eval::functional_groups::{FgElement, FunctionalGroup};
 use crate::eval::{element::Element, molecule::Molecule};
 
 fn main() {
@@ -39,13 +40,13 @@ fn main() {
     // dbg!(&eth.value());
     // dbg!(&bor.value());
 
-    let h = FunctionalGroup::new_ether(Molecule::E(Element::Hf));
-    let e = FunctionalGroup::new_ether(Molecule::E(Element::Md));
-    let l = FunctionalGroup::new_ether(Molecule::E(Element::Hs));
-    let o = FunctionalGroup::new_ether(Molecule::E(Element::Rg));
+    let h = FunctionalGroup::new_ether(FgElement::E(Element::Hf));
+    let e = FunctionalGroup::new_ether(FgElement::E(Element::Md));
+    let l = FunctionalGroup::new_ether(FgElement::E(Element::Hs));
+    let o = FunctionalGroup::new_ether(FgElement::E(Element::Rg));
 
-    let mut hello = Alkane::new_n_alkane(5);
-    hello.fill(vec![
+    let mut alk = Alkane::new_n_alkane(5);
+    alk.fill(vec![
         AlkaneElement::F(h.clone()),
         AlkaneElement::F(e.clone()),
         AlkaneElement::F(l.clone()),
@@ -53,11 +54,13 @@ fn main() {
         AlkaneElement::F(o.clone()),
     ]);
 
-    let sulfide = FunctionalGroup::new_sulfide(Molecule::Fg(FunctionalGroup::Alkane(hello)));
-    dbg!(sulfide.value());
+    let hello = FunctionalGroup::new_sulfide(FgElement::F(FunctionalGroup::Alkane(alk)));
+    let six = FunctionalGroup::new_ether(FgElement::E(Element::C));
 
+    let amine = FunctionalGroup::new_amine(FgElement::F(six), FgElement::F(hello));
+    dbg!(&amine.value());
     println!(
         "{:?}",
-        dot::Dot::with_config(&sulfide.flatten().atoms(), &dot_config)
+        dot::Dot::with_config(&amine.flatten().atoms(), &dot_config)
     );
 }

@@ -12,17 +12,6 @@ use super::FunctionalGroup;
 #[derive(Debug, Clone)]
 pub struct Sulfide(pub Atoms);
 
-impl Weighable for Sulfide {
-    fn atomic_weight(&self) -> i64 {
-        let atoms = &self.0;
-        atoms
-            .atoms()
-            .neighbors(atoms.head)
-            .map(|neighbor| atoms.atoms().node_weight(neighbor).unwrap().atomic_weight())
-            .sum()
-    }
-}
-
 impl Valuable for Sulfide {
     fn value(&self) -> Value {
         let mut chars = Vec::new();
@@ -90,5 +79,16 @@ impl AtomLike for Sulfide {
 
     fn add_edge(&mut self, m: NodeIndex, n: NodeIndex) -> EdgeIndex {
         self.0.add_edge(m, n)
+    }
+}
+
+impl Weighable for Sulfide {
+    fn atomic_weight(&self) -> i64 {
+        let atoms = &self.0;
+        atoms
+            .atoms()
+            .neighbors(atoms.head)
+            .map(|neighbor| atoms.atoms().node_weight(neighbor).unwrap().atomic_weight())
+            .sum()
     }
 }

@@ -9,6 +9,7 @@ use super::atoms::Atoms;
 use super::element::Element;
 use super::functional_groups::FunctionalGroup;
 use super::molecule::Molecule;
+use super::value::Weighable;
 
 #[derive(Debug, Clone)]
 pub enum AlkaneElement {
@@ -196,5 +197,21 @@ impl AtomLike for Alkane {
 
     fn add_edge(&mut self, m: NodeIndex, n: NodeIndex) -> EdgeIndex {
         self.chain.add_edge(m, n)
+    }
+}
+
+impl Weighable for Alkane {
+    fn atomic_weight(&self) -> i64 {
+        self.chain
+            .atoms()
+            .neighbors(self.chain.head)
+            .map(|neighbor| {
+                self.chain
+                    .atoms()
+                    .node_weight(neighbor)
+                    .unwrap()
+                    .atomic_weight()
+            })
+            .sum()
     }
 }
