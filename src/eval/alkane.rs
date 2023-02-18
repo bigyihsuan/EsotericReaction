@@ -6,7 +6,7 @@ use petgraph::visit::IntoNeighbors;
 
 use super::atom_like::AtomLike;
 use super::atoms::Atoms;
-use super::element::{Element, ElementHeader};
+use super::element::Element;
 use super::functional_groups::FunctionalGroup;
 use super::molecule::Molecule;
 
@@ -48,40 +48,6 @@ impl Alkane {
 
     pub fn add_carbon_after(&mut self) {
         let carbon = self.chain.mut_atoms().add_node(Molecule::E(Element::C));
-        if let Some(Molecule::E(Element::Header(ElementHeader::AlkaneHeader))) =
-            self.chain.atoms().node_weight(self.current_atom)
-        {
-            // current atom is an alkane header; try to connect the new carbon with the first child
-            if let Some(first_child) = self
-                .chain
-                .atoms()
-                .neighbors(self.current_atom)
-                .filter(|neighbor| {
-                    if let Some(&Molecule::E(Element::C)) =
-                        self.chain.atoms().node_weight(*neighbor)
-                    {
-                        true
-                    } else {
-                        false
-                    }
-                })
-                .collect::<Vec<_>>()
-                .first()
-                .cloned()
-            {
-                // there is a child, put the carbon in between the header and the child
-                self.chain
-                    .mut_atoms()
-                    .add_edge(self.current_atom, carbon, ());
-                self.chain.add_edge(carbon, first_child);
-                let existing_edge = self.chain.atoms().find_edge(self.current_atom, first_child);
-                if let Some(existing_edge) = existing_edge {
-                    self.chain.mut_atoms().remove_edge(existing_edge);
-                }
-                return;
-            }
-            // there is no first child, do the regular thing
-        }
         self.chain
             .mut_atoms()
             .add_edge(self.current_atom, carbon, ());
@@ -95,75 +61,21 @@ impl Alkane {
     pub fn add_carbon_before(&mut self) {
         let carbon = self.chain.mut_atoms().add_node(Molecule::E(Element::C));
 
-        if let Some(Molecule::E(Element::Header(ElementHeader::AlkaneHeader))) =
-            self.chain.atoms().node_weight(self.current_atom)
-        {
-            // current atom is an alkane header; try to connect the new carbon with the first child
-            if let Some(first_child) = self
-                .chain
-                .atoms()
-                .neighbors(self.current_atom)
-                .filter(|neighbor| {
-                    if let Some(&Molecule::E(Element::C)) =
-                        self.chain.atoms().node_weight(*neighbor)
-                    {
-                        true
-                    } else {
-                        false
-                    }
-                })
-                .collect::<Vec<_>>()
-                .first()
-                .cloned()
-            {
-                // there is a child, put the carbon in between the header and the child
-                self.chain
-                    .mut_atoms()
-                    .add_edge(self.current_atom, carbon, ());
-                self.chain.mut_atoms().add_edge(carbon, first_child, ());
-                let existing_edge = self.chain.atoms().find_edge(self.current_atom, first_child);
-                if let Some(existing_edge) = existing_edge {
-                    self.chain.mut_atoms().remove_edge(existing_edge);
-                }
-                return;
-            }
-            // there is no first child, do the regular thing
-        }
-
         let previous_index = self.get_current_atom_index();
         match previous_index {
             Some(idx) if idx > 0 => {
                 let prev_node = self.backbone.get(idx - 1).unwrap().clone();
-                let prev_mol = self.chain.atoms().node_weight(prev_node).unwrap();
-                if let &Molecule::E(Element::Header(ElementHeader::AlkaneHeader)) = prev_mol {
-                    // the previous atom is an alkane
-                    // detatch the alkane and this node
-                    let (alkane, alkane_idx) = (prev_node, idx);
-                    let alk_curr_edge = self
-                        .chain
-                        .atoms()
-                        .find_edge(alkane, self.current_atom)
-                        .unwrap();
-                    self.chain.mut_atoms().remove_edge(alk_curr_edge);
-                    // connect the new carbon to the current atom
-                    self.chain.add_edge(carbon, self.current_atom);
-                    // connect the alkane to the new carbon
-                    self.chain.add_edge(alkane, carbon);
-                    self.backbone.insert(alkane_idx, carbon);
-                } else {
-                    // the previous atom is not an alkane
-                    // detach previous and current
-                    let prev_curr_edge = self
-                        .chain
-                        .atoms()
-                        .find_edge(prev_node, self.current_atom)
-                        .unwrap();
-                    self.chain.mut_atoms().remove_edge(prev_curr_edge);
-                    // insert the carbon
-                    self.chain.add_edge(prev_node, carbon);
-                    self.chain.add_edge(carbon, self.current_atom);
-                    self.backbone.insert(idx, carbon);
-                }
+                // detach previous and current
+                let prev_curr_edge = self
+                    .chain
+                    .atoms()
+                    .find_edge(prev_node, self.current_atom)
+                    .unwrap();
+                self.chain.mut_atoms().remove_edge(prev_curr_edge);
+                // insert the carbon
+                self.chain.add_edge(prev_node, carbon);
+                self.chain.add_edge(carbon, self.current_atom);
+                self.backbone.insert(idx, carbon);
             }
             Some(_idx) => {
                 // current atom is the first alkane
@@ -175,16 +87,24 @@ impl Alkane {
         }
     }
 
-    pub fn add_molecule(&mut self, mol: Molecule) {
-        let m = self.chain.mut_atoms().add_node(mol);
+    pub fn add(&mut self, stuff: AlkaneElement) {
+        match stuff {
+            AlkaneElement::E(e) => self.add_element(e),
+            AlkaneElement::M(m) => self.add_molecule(m),
+            AlkaneElement::F(f) => self.add_functional_group(f),
+        }
+    }
+
+    pub fn add_molecule(&mut self, m: Molecule) {
+        let m = self.chain.mut_atoms().add_node(m);
         self.chain.add_edge(self.current_atom, m);
     }
-    pub fn add_element(&mut self, ele: Element) {
-        let e = self.chain.mut_atoms().add_node(Molecule::E(ele));
+    pub fn add_element(&mut self, e: Element) {
+        let e = self.chain.mut_atoms().add_node(Molecule::E(e));
         self.chain.add_edge(self.current_atom, e);
     }
-    pub fn add_functional_group(&mut self, fg: FunctionalGroup) {
-        let f = self.chain.mut_atoms().add_node(Molecule::Fg(fg));
+    pub fn add_functional_group(&mut self, f: FunctionalGroup) {
+        let f = self.chain.mut_atoms().add_node(Molecule::Fg(f));
         self.chain.add_edge(self.current_atom, f);
     }
     pub fn add_alkane(&mut self, alk: Alkane) {

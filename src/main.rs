@@ -4,15 +4,12 @@ mod tok;
 mod util;
 
 use eval::alkane::AlkaneElement;
-use eval::functional_groups::ether::Ether;
 use eval::value::Valuable;
 use petgraph::dot::{self, Config};
-use petgraph::stable_graph::StableUnGraph;
 
 use crate::eval::alkane::Alkane;
 use crate::eval::atom_like::AtomLike;
 use crate::eval::functional_groups::FunctionalGroup;
-use crate::eval::value::Weighable;
 use crate::eval::{element::Element, molecule::Molecule};
 
 fn main() {

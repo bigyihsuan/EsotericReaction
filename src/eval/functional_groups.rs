@@ -21,19 +21,18 @@ pub enum FunctionalGroup {
     Amine(Atoms),
 }
 use petgraph::stable_graph::{EdgeIndex, NodeIndex};
-use FunctionalGroup as Fg;
 
 impl FunctionalGroup {
     pub fn new_alkane() -> Self {
         let alkane = Alkane::new();
-        Fg::Alkane(alkane)
+        Self::Alkane(alkane)
     }
     pub fn new_ether(r: Molecule) -> Self {
         let mut atoms = Atoms::new();
         let o = atoms.add_node(Molecule::E(Element::O));
         let r_ = atoms.add_node(r);
         atoms.add_edge(o, r_);
-        Fg::Ether(Ether(atoms))
+        Self::Ether(Ether(atoms))
     }
     pub fn new_borinic_acid(r: Molecule) -> Self {
         let mut atoms = Atoms::new();
@@ -44,27 +43,27 @@ impl FunctionalGroup {
         atoms.add_edge(b, o);
         atoms.add_edge(o, h);
         atoms.add_edge(b, r_);
-        Fg::BorinicAcid(BorinicAcid(atoms))
+        Self::BorinicAcid(BorinicAcid(atoms))
     }
     pub fn new_sulfide(r: Molecule) -> Self {
         let mut atoms = Atoms::new();
         let s = atoms.add_node(Molecule::E(Element::S));
         let r_ = atoms.add_node(r);
         atoms.add_edge(s, r_);
-        Fg::Sulfide(Sulfide(atoms))
+        Self::Sulfide(Sulfide(atoms))
     }
     pub fn new_amine() -> Self {
         let amine = Atoms::new();
-        Fg::Amine(amine)
+        Self::Amine(amine)
     }
 
     fn unwrap(&self) -> &AtomGraph {
         match self {
-            Fg::Ether(a) => a.0.atoms(),
-            Fg::BorinicAcid(a) => a.0.atoms(),
-            Fg::Sulfide(a) => a.0.atoms(),
-            Fg::Amine(a) => a.atoms(),
-            Fg::Alkane(a) => a.chain.atoms(),
+            Self::Ether(a) => a.0.atoms(),
+            Self::BorinicAcid(a) => a.0.atoms(),
+            Self::Sulfide(a) => a.0.atoms(),
+            Self::Amine(a) => a.atoms(),
+            Self::Alkane(a) => a.chain.atoms(),
         }
     }
 }
@@ -92,11 +91,11 @@ impl AtomLike for FunctionalGroup {
 
     fn flatten(&self) -> Atoms {
         match self {
-            Fg::Ether(a) => a.0.flatten(),
-            Fg::BorinicAcid(a) => a.0.flatten(),
-            Fg::Sulfide(a) => a.0.flatten(),
-            Fg::Amine(a) => a.flatten(),
-            Fg::Alkane(a) => a.flatten(),
+            Self::Ether(a) => a.0.flatten(),
+            Self::BorinicAcid(a) => a.0.flatten(),
+            Self::Sulfide(a) => a.0.flatten(),
+            Self::Amine(a) => a.flatten(),
+            Self::Alkane(a) => a.flatten(),
         }
     }
 
@@ -112,11 +111,11 @@ impl AtomLike for FunctionalGroup {
 impl Valuable for FunctionalGroup {
     fn value(&self) -> Value {
         match self {
-            Fg::Alkane(_) => todo!(),
-            Fg::Ether(eth) => eth.value(),
-            Fg::BorinicAcid(bor) => bor.value(),
-            Fg::Sulfide(sul) => sul.value(),
-            Fg::Amine(_) => todo!(),
+            Self::Alkane(_) => todo!(),
+            Self::Ether(eth) => eth.value(),
+            Self::BorinicAcid(bor) => bor.value(),
+            Self::Sulfide(sul) => sul.value(),
+            Self::Amine(_) => todo!(),
         }
     }
 }
@@ -124,11 +123,11 @@ impl Valuable for FunctionalGroup {
 impl Weighable for FunctionalGroup {
     fn atomic_weight(&self) -> i64 {
         match self {
-            Fg::Alkane(alk) => todo!(),
-            Fg::Ether(eth) => eth.atomic_weight(),
-            Fg::BorinicAcid(bor) => bor.atomic_weight(),
-            Fg::Sulfide(sulf) => todo!(),
-            Fg::Amine(am) => todo!(),
+            Self::Alkane(alk) => todo!(),
+            Self::Ether(eth) => eth.atomic_weight(),
+            Self::BorinicAcid(bor) => bor.atomic_weight(),
+            Self::Sulfide(sulf) => todo!(),
+            Self::Amine(am) => todo!(),
         }
     }
 }
