@@ -47,6 +47,12 @@ impl Alkane {
         alk
     }
 
+    pub fn new_with(stuff: Vec<AlkaneElement>) -> Alkane {
+        let mut alk = Alkane::new_n_alkane(stuff.len());
+        alk.fill(stuff);
+        alk
+    }
+
     pub fn add_carbon_after(&mut self) {
         let carbon = self.chain.mut_atoms().add_node(Molecule::E(Element::C));
         self.chain
