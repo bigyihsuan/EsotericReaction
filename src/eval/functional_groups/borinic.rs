@@ -1,11 +1,8 @@
-use petgraph::stable_graph::{EdgeIndex, NodeIndex};
+use std::ops::Add;
 
 use crate::eval::{
-    atom_like::AtomLike,
-    atoms::Atoms,
-    element::Element,
-    molecule::Molecule,
-    value::{Valuable, Value, Weighable},
+    atom_like::AtomLike, atoms::Atoms, element::Element, molecule::Molecule, traits::Valuable,
+    value::Value,
 };
 
 use super::{fg_macros, FgElement};
@@ -44,3 +41,36 @@ impl Valuable for BorinicAcid {
 }
 
 fg_macros::fg!(BorinicAcid);
+
+impl From<Value> for BorinicAcid {
+    fn from(value: Value) -> Self {
+        if let Value::Boolean(b) = value {
+            BorinicAcid::from(b)
+        } else {
+            BorinicAcid::from(false)
+        }
+    }
+}
+
+impl From<bool> for BorinicAcid {
+    fn from(value: bool) -> Self {
+        let mut bor = BorinicAcid::new();
+        let head = bor.head;
+        if value {
+            let h = bor.add_node(Molecule::E(Element::H));
+            bor.add_edge(head, h);
+        }
+        bor
+    }
+}
+
+impl Add for BorinicAcid {
+    type Output = BorinicAcid;
+
+    fn add(self, rhs: Self) -> Self::Output {
+        let l = self.value();
+        let r = rhs.value();
+        let v = l + r;
+        BorinicAcid::from(v)
+    }
+}

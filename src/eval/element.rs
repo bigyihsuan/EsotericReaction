@@ -1,6 +1,6 @@
 use std::fmt::{Debug, Display};
 
-use super::value::Weighable;
+use super::traits::Weighable;
 
 const HEAVY_LETTERS: &str = "nubtqphsoe";
 
@@ -516,8 +516,6 @@ impl Weighable for Element {
     }
 }
 
-impl Element {}
-
 macro_rules! from_for_element {
     ($t:ty) => {
         impl From<$t> for Element {
@@ -673,7 +671,9 @@ from_for_element!(u8);
 from_for_element!(u16);
 from_for_element!(u32);
 from_for_element!(u64);
+from_for_element!(u128);
 from_for_element!(i8);
 from_for_element!(i16);
 from_for_element!(i32);
 from_for_element!(i64);
+from_for_element!(i128);

@@ -3,7 +3,7 @@
 //     pub head: NodeIndex,
 // }
 
-use super::{element::Element, functional_groups::FunctionalGroup, value::Weighable};
+use super::{element::Element, functional_groups::FunctionalGroup, traits::Weighable};
 
 #[derive(Debug, Clone)]
 pub enum Molecule {

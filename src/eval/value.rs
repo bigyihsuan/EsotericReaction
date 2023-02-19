@@ -1,4 +1,4 @@
-use std::{collections::HashMap, fmt::Display, hash::Hash};
+use std::{collections::HashMap, fmt::Display, hash::Hash, ops::Add};
 
 #[derive(Debug, Clone)]
 pub enum Value {
@@ -34,9 +34,7 @@ impl PartialEq for Value {
     }
 }
 
-impl Eq for Value {
-    fn assert_receiver_is_total_eq(&self) {}
-}
+impl Eq for Value {}
 
 impl Hash for Value {
     fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
@@ -71,10 +69,170 @@ impl Display for Value {
     }
 }
 
-pub trait Valuable {
-    fn value(&self) -> Value;
+impl Add for Value {
+    type Output = Value;
+
+    fn add(self, rhs: Self) -> Self::Output {
+        match (self, rhs) {
+            (Value::Number(l), Value::Number(r)) => Value::Number(l + r),
+            (Value::Boolean(l), Value::Boolean(r)) => Value::Boolean(l && r),
+            (Value::String(l), Value::String(r)) => {
+                let mut v = l;
+                r.iter().for_each(|e| v.push(*e));
+                Value::String(v)
+            }
+            (Value::Pair(la, lb), Value::Pair(ra, rb)) => {
+                let a = *la + *ra;
+                let b = *lb + *rb;
+                Value::Pair(Box::new(a), Box::new(b))
+            }
+            (Value::List(l), Value::List(r)) => {
+                let mut v = l;
+                r.iter().for_each(|e| v.push(e.clone()));
+                Value::List(v)
+            }
+            (Value::Map(l), Value::Map(r)) => {
+                let mut m = l;
+                r.iter().for_each(|(k, v)| {
+                    m.insert(k.clone(), v.clone());
+                });
+                Value::Map(m)
+            }
+            (l, r) => panic!("not supported for Add: {} and {}", l, r),
+        }
+    }
 }
 
-pub trait Weighable {
-    fn atomic_numbers(&self) -> i64;
+#[derive(Clone)]
+enum ValueType {
+    // Number
+    U8(u8),
+    U16(u16),
+    U32(u32),
+    U64(u64),
+    U128(u128),
+    I8(i8),
+    I16(i16),
+    I32(i32),
+    I64(i64),
+    I128(i128),
+    // Bool
+    Bool(bool),
+    // String
+    String(String),
+    Str(&'static str),
+    VecChar(Vec<char>),
+    // Pair
+    Pair((Box<ValueType>, Box<ValueType>)),
+    // List
+    Vec(Vec<ValueType>),
+    // Map
+    HashMap(HashMap<ValueType, ValueType>),
+}
+
+macro_rules! impl_from_num_for_value {
+    ($T:ty) => {
+        impl From<$T> for Value {
+            fn from(value: $T) -> Self {
+                Value::Number(value as i64)
+            }
+        }
+    };
+}
+
+impl_from_num_for_value!(u8);
+impl_from_num_for_value!(u16);
+impl_from_num_for_value!(u32);
+impl_from_num_for_value!(u64);
+impl_from_num_for_value!(u128);
+impl_from_num_for_value!(i8);
+impl_from_num_for_value!(i16);
+impl_from_num_for_value!(i32);
+impl_from_num_for_value!(i64);
+impl_from_num_for_value!(i128);
+
+impl From<bool> for Value {
+    fn from(value: bool) -> Self {
+        Value::Boolean(value)
+    }
+}
+impl From<String> for Value {
+    fn from(value: String) -> Self {
+        Value::String(value.chars().collect())
+    }
+}
+impl From<&str> for Value {
+    fn from(value: &str) -> Self {
+        Value::String(value.chars().collect())
+    }
+}
+impl From<Vec<char>> for Value {
+    fn from(value: Vec<char>) -> Self {
+        Value::String(value)
+    }
+}
+impl From<(Value, Value)> for Value {
+    fn from(value: (Value, Value)) -> Self {
+        let l = value.0;
+        let r = value.1;
+        Value::Pair(Box::new(l), Box::new(r))
+    }
+}
+impl From<(ValueType, ValueType)> for Value {
+    fn from(value: (ValueType, ValueType)) -> Self {
+        let l = value.0;
+        let r = value.1;
+        Value::Pair(Box::new(Value::from(l)), Box::new(Value::from(r)))
+    }
+}
+impl From<(Box<ValueType>, Box<ValueType>)> for Value {
+    fn from(value: (Box<ValueType>, Box<ValueType>)) -> Self {
+        let l = value.0;
+        let r = value.1;
+        Value::Pair(Box::new(Value::from(*l)), Box::new(Value::from(*r)))
+    }
+}
+impl From<Vec<ValueType>> for Value {
+    fn from(value: Vec<ValueType>) -> Self {
+        Value::List(value.iter().map(|e| Value::from(e.clone())).collect())
+    }
+}
+
+impl From<HashMap<ValueType, ValueType>> for Value {
+    fn from(value: HashMap<ValueType, ValueType>) -> Self {
+        Value::Map(
+            value
+                .iter()
+                .map(|(k, v)| {
+                    let k = Value::from(k.clone());
+                    let v = Value::from(v.clone());
+                    (k, v)
+                })
+                .collect(),
+        )
+    }
+}
+
+impl From<ValueType> for Value {
+    fn from(value: ValueType) -> Self {
+        match value {
+            ValueType::U8(v) => Value::from(v),
+            ValueType::U16(v) => Value::from(v),
+            ValueType::U32(v) => Value::from(v),
+            ValueType::U64(v) => Value::from(v),
+            ValueType::U128(v) => Value::from(v),
+            ValueType::I8(v) => Value::from(v),
+            ValueType::I16(v) => Value::from(v),
+            ValueType::I32(v) => Value::from(v),
+            ValueType::I64(v) => Value::from(v),
+            ValueType::I128(v) => Value::from(v),
+            ValueType::Bool(v) => Value::from(v),
+            ValueType::String(v) => Value::from(v),
+            ValueType::Str(v) => Value::from(v),
+            ValueType::VecChar(v) => Value::from(v),
+            ValueType::Pair(v) => Value::from(v),
+            ValueType::Vec(v) => Value::from(v),
+            ValueType::HashMap(v) => Value::from(v),
+        }
+    }
 }

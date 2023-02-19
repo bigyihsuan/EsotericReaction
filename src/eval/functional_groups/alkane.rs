@@ -1,14 +1,15 @@
 use std::collections::vec_deque::Iter;
 use std::collections::{HashMap, VecDeque};
+use std::ops::Add;
 
 use petgraph::stable_graph::{EdgeIndex, NodeIndex};
-use petgraph::visit::IntoNeighbors;
 
 use crate::eval::atom_like::AtomLike;
 use crate::eval::atoms::Atoms;
 use crate::eval::element::Element;
 use crate::eval::molecule::Molecule;
-use crate::eval::value::{Valuable, Value};
+use crate::eval::traits::Valuable;
+use crate::eval::value::Value;
 
 use super::{fg_macros, FunctionalGroup};
 
@@ -41,10 +42,12 @@ impl Alkane {
 
     pub fn new_n_alkane(n: usize) -> Alkane {
         let mut alk = Alkane::new();
+        let old_head = alk.head;
         for _ in 0..n {
             alk.add_carbon_after();
             alk.move_down();
         }
+        alk.head = old_head;
         alk
     }
 
@@ -187,12 +190,6 @@ impl Alkane {
     }
 }
 
-impl Default for Alkane {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 impl AtomLike for Alkane {
     fn get_atoms(&self) -> &Atoms {
         &self.chain
@@ -249,3 +246,36 @@ impl Valuable for Alkane {
 }
 
 fg_macros::fg!(Alkane, chain);
+
+impl From<Value> for Alkane {
+    fn from(value: Value) -> Self {
+        if let Value::List(v) = value {
+            Alkane::new_with(
+                v.iter()
+                    .map(|e| AlkaneElement::F(FunctionalGroup::from(e.clone())))
+                    .collect(),
+            )
+        } else if let Value::Map(m) = value {
+            Alkane::new_with(
+                m.iter()
+                    .map(|(k, v)| {
+                        AlkaneElement::F(FunctionalGroup::from(Value::from((k.clone(), v.clone()))))
+                    })
+                    .collect(),
+            )
+        } else {
+            Alkane::new()
+        }
+    }
+}
+
+impl Add for Alkane {
+    type Output = Alkane;
+
+    fn add(self, rhs: Self) -> Self::Output {
+        let l = self.value();
+        let r = rhs.value();
+        let v = l + r;
+        Alkane::from(v)
+    }
+}

@@ -1,6 +1,6 @@
 macro_rules! fg {
     ($T:ty, $field:tt) => {
-        use crate::eval::value::Weighable;
+        use crate::eval::traits::Weighable;
         use std::ops::{Deref, DerefMut};
 
         impl Deref for $T {
@@ -25,8 +25,15 @@ macro_rules! fg {
                     .sum()
             }
         }
+
+        impl Default for $T {
+            fn default() -> Self {
+                Self::new()
+            }
+        }
     };
     ($T:ty) => {
+        use crate::eval::traits::Weighable;
         use std::ops::{Deref, DerefMut};
 
         impl Deref for $T {
@@ -49,6 +56,12 @@ macro_rules! fg {
                     .neighbors(self.head)
                     .map(|neighbor| self.atoms().node_weight(neighbor).unwrap().atomic_numbers())
                     .sum()
+            }
+        }
+
+        impl Default for $T {
+            fn default() -> Self {
+                Self::new()
             }
         }
     };

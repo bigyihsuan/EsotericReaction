@@ -1,9 +1,8 @@
+use std::ops::Add;
+
 use crate::eval::{
-    atom_like::AtomLike,
-    atoms::Atoms,
-    element::Element,
-    molecule::Molecule,
-    value::{Valuable, Value, Weighable},
+    atom_like::AtomLike, atoms::Atoms, element::Element, molecule::Molecule, traits::Valuable,
+    value::Value,
 };
 
 use super::{
@@ -107,6 +106,7 @@ impl From<&str> for Sulfide {
         sulfide
     }
 }
+
 impl From<char> for Sulfide {
     fn from(c: char) -> Sulfide {
         let mut sulfide = Sulfide::new();
@@ -116,5 +116,41 @@ impl From<char> for Sulfide {
         sulfide
     }
 }
+impl From<Vec<char>> for Sulfide {
+    fn from(s: Vec<char>) -> Sulfide {
+        let mut sulfide = Sulfide::new();
+        let sulfur = sulfide.0.head;
+        let alk = Alkane::new_with(
+            s.iter()
+                .map(|c| AlkaneElement::F(FunctionalGroup::Ether(Ether::from(*c))))
+                .collect(),
+        );
+        let mol = sulfide.add_node(Molecule::F(FunctionalGroup::Alkane(alk)));
+        sulfide.add_edge(sulfur, mol);
+        sulfide
+    }
+}
+
+impl From<Value> for Sulfide {
+    fn from(value: Value) -> Self {
+        if let Value::String(s) = value {
+            Sulfide::from(s)
+        } else {
+            Sulfide::from("")
+        }
+    }
+}
 
 fg_macros::fg!(Sulfide);
+
+impl Add for Sulfide {
+    type Output = Sulfide;
+
+    fn add(self, rhs: Self) -> Self::Output {
+        // TODO: instead of converting to value, act directly on the atoms?
+        let l = self.value();
+        let r = rhs.value();
+        let v = l + r;
+        Sulfide::from(v)
+    }
+}

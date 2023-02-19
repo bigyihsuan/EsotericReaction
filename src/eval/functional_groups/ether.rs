@@ -1,14 +1,11 @@
-use petgraph::stable_graph::{EdgeIndex, NodeIndex};
+use std::ops::Add;
 
 use crate::eval::{
-    atom_like::AtomLike,
-    atoms::Atoms,
-    element::Element,
-    molecule::Molecule,
-    value::{Valuable, Value, Weighable},
+    atom_like::AtomLike, atoms::Atoms, element::Element, molecule::Molecule, traits::Valuable,
+    value::Value,
 };
 
-use super::{fg_macros, FgElement};
+use super::{fg_macros, FgElement, FunctionalGroup};
 
 #[derive(Debug, Clone)]
 pub struct Ether(pub Atoms);
@@ -36,17 +33,28 @@ impl Valuable for Ether {
     }
 }
 
+fg_macros::fg!(Ether);
+
 impl From<char> for Ether {
     fn from(value: char) -> Ether {
         let mut ether = Ether::new();
         let e = Element::from(value as u32);
-        let e = ether.0.add_node(Molecule::E(e));
-        ether.0.add_edge(ether.0.head, e);
+        let e = ether.add_node(Molecule::E(e));
+        let head = ether.head;
+        ether.add_edge(head, e);
         ether
     }
 }
 
-fg_macros::fg!(Ether);
+impl From<Value> for Ether {
+    fn from(value: Value) -> Self {
+        if let Value::Number(n) = value {
+            Ether::from(n)
+        } else {
+            Ether::from(0)
+        }
+    }
+}
 
 macro_rules! impl_from_for_ether {
     ($t:ty) => {
@@ -54,8 +62,8 @@ macro_rules! impl_from_for_ether {
             fn from(value: $t) -> Ether {
                 let mut ether = Ether::new();
                 let e = Element::from(value);
-                let e = ether.0.add_node(Molecule::E(e));
-                ether.0.add_edge(ether.0.head, e);
+                let e = ether.add_node(Molecule::E(e));
+                ether.0.add_edge(ether.head, e);
                 ether
             }
         }
@@ -66,7 +74,20 @@ impl_from_for_ether!(u8);
 impl_from_for_ether!(u16);
 impl_from_for_ether!(u32);
 impl_from_for_ether!(u64);
+impl_from_for_ether!(u128);
 impl_from_for_ether!(i8);
 impl_from_for_ether!(i16);
 impl_from_for_ether!(i32);
 impl_from_for_ether!(i64);
+impl_from_for_ether!(i128);
+
+impl Add for Ether {
+    type Output = Ether;
+
+    fn add(self, rhs: Self) -> Self::Output {
+        let l = self.value();
+        let r = rhs.value();
+        let v = l + r;
+        Ether::from(v)
+    }
+}

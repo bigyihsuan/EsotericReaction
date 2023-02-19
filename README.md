@@ -164,29 +164,27 @@ Binary operations on the alkane are highly dependent on the types of the two arg
 Like with unary alkane operations, any `X` can be replaced with `Li` and `Be`
 to change which carbon is targeted for the second argument.
 
-| Instruction | Effect   | Notes                                                                                           |
-| ----------- | -------- | ----------------------------------------------------------------------------------------------- |
-| `Al`        | Add      |                                                                                                 |
-| `Si`        | Subtract |                                                                                                 |
-| `Mn`        | Multiply |                                                                                                 |
-| `Db`        | Divide   |                                                                                                 |
-| `Mo`        | Modulo   |                                                                                                 |
-| `In`        | Index    | Current functional group must be String, Pair, or List. Other functional group must be Integer. |
-| `Pd`        | Append   | Current functional group must be String, Pair, or List.                                         |
-| `Ge`        | Get      | Current functional group must be Map.                                                           |
+| Instruction | Effect   | Notes                                                                                                                 |
+| ----------- | -------- | --------------------------------------------------------------------------------------------------------------------- |
+| `Al`        | Add      |                                                                                                                       |
+| `Si`        | Subtract |                                                                                                                       |
+| `Mn`        | Multiply |                                                                                                                       |
+| `Db`        | Divide   |                                                                                                                       |
+| `Mo`        | Modulo   |                                                                                                                       |
+| `In`        | Index    | Current functional group must be String, Pair, List, or Map. Other functional group must be the same type as the key. |
+| `Pd`        | Append   | Current functional group must be String, Pair, or List.                                                               |
 
 #### Binary Operations Type Charts
 
 Types in parentheses `(type)` are the second argument.
 
-| Op  | Integer       | Boolean | String         | Pair              | List              | Map             |
-| --- | ------------- | ------- | -------------- | ----------------- | ----------------- | --------------- |
-| Add | Addition      | And     | Concat         |                   | Concat            | Concat          |
-| Sub | Subtraction   | Or      | Difference     |                   | Difference        | Difference      |
-| Mul | Multiplcation | Xor     | (Int) Repeat   |                   | (Int) Repeat      |                 |
-| Div | Division      |         |                |                   |                   |                 |
-| Mod | Modulo        |         |                |                   |                   |                 |
-| Idx |               |         | (Int) Get Char | (Int) Get Element | (Int) Get Element |                 |
-| App |               |         |                |                   |                   |                 |
-| Get |               |         |                |                   |                   | (key) Get Value |
-|     |               |         |                |                   |                   |                 |
+| Op  | Integer       | Boolean | String         | Pair              | List              | Map                                  |
+| --- | ------------- | ------- | -------------- | ----------------- | ----------------- | ------------------------------------ |
+| Add | Addition      | And     | Concat         | Element-wise Add  | Concat            | Set Union (of keys)                  |
+| Sub | Subtraction   | Or      | Difference     | Element-wise Sub  | Difference        | Set Difference                       |
+| Mul | Multiplcation | Xor     | (Int) Repeat   | Element-wise Mul  | (Int) Repeat      | Cartesian Product (key, pair(v1,v2)) |
+| Div | Division      |         |                | Element-wise Div  |                   | Set Intersection (of keys)           |
+| Mod | Modulo        |         |                | Element-wise Mod  |                   |                                      |
+| Idx |               |         | (Int) Get Char | (Int) Get Element | (Int) Get Element | (key) Get Value                      |
+| App |               |         |                |                   |                   |                                      |
+|     |               |         |                |                   |                   |                                      |

@@ -1,14 +1,11 @@
-use petgraph::stable_graph::{EdgeIndex, NodeIndex};
+use std::ops::Add;
 
 use crate::eval::{
-    atom_like::AtomLike,
-    atoms::Atoms,
-    element::Element,
-    molecule::Molecule,
-    value::{Valuable, Value, Weighable},
+    atom_like::AtomLike, atoms::Atoms, element::Element, molecule::Molecule, traits::Valuable,
+    value::Value,
 };
 
-use super::{fg_macros, FgElement};
+use super::{fg_macros, FgElement, FunctionalGroup};
 
 #[derive(Debug, Clone)]
 pub struct Amine(pub Atoms);
@@ -51,3 +48,32 @@ impl Valuable for Amine {
 }
 
 fg_macros::fg!(Amine);
+
+impl From<Value> for Amine {
+    fn from(value: Value) -> Self {
+        if let Value::Pair(l, r) = value {
+            Amine::from((*l, *r))
+        } else {
+            Amine::new()
+        }
+    }
+}
+
+impl From<(Value, Value)> for Amine {
+    fn from((k, v): (Value, Value)) -> Self {
+        let k = FgElement::F(FunctionalGroup::from(k));
+        let v = FgElement::F(FunctionalGroup::from(v));
+        Amine::new_with(k, v)
+    }
+}
+
+impl Add for Amine {
+    type Output = Amine;
+
+    fn add(self, rhs: Self) -> Self::Output {
+        let l = self.value();
+        let r = rhs.value();
+        let v = l + r;
+        Amine::from(v)
+    }
+}
