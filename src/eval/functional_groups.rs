@@ -1,12 +1,14 @@
+pub mod alkane;
 pub mod amine;
 pub mod borinic;
 pub mod ether;
+pub mod fg_macros;
 pub mod sulfide;
 
+use self::alkane::Alkane;
 use self::sulfide::Sulfide;
 use self::{amine::Amine, borinic::BorinicAcid, ether::Ether};
 
-use super::alkane::Alkane;
 use super::atom_like::AtomLike;
 use super::atoms::{AtomGraph, Atoms};
 use super::element::Element;
@@ -39,47 +41,28 @@ pub enum FunctionalGroup {
 
 impl FunctionalGroup {
     pub fn new_alkane() -> Self {
-        let alkane = Alkane::new();
-        Self::Alkane(alkane)
+        Self::Alkane(Alkane::new())
     }
     pub fn new_ether(r: FgElement) -> Self {
-        let mut atoms = Atoms::new();
-        let o = atoms.add_node(Molecule::E(Element::O));
-        let r = atoms.add_node(r.as_molecule());
-        atoms.add_edge(o, r);
-        Self::Ether(Ether(atoms))
+        Self::Ether(Ether::new_with(r))
     }
     pub fn new_borinic_acid(r: FgElement) -> Self {
-        let mut atoms = Atoms::new();
-        let b = atoms.add_node(Molecule::E(Element::B));
-        let o = atoms.add_node(Molecule::E(Element::O));
-        let h = atoms.add_node(Molecule::E(Element::H));
-        let r = atoms.add_node(r.as_molecule());
-        atoms.add_edge(b, o);
-        atoms.add_edge(o, h);
-        atoms.add_edge(b, r);
-        Self::BorinicAcid(BorinicAcid(atoms))
+        Self::BorinicAcid(BorinicAcid::new_with(r))
     }
     pub fn new_sulfide(r: FgElement) -> Self {
         Self::Sulfide(Sulfide::new_with(r))
     }
     pub fn new_amine(r1: FgElement, r2: FgElement) -> Self {
-        let mut atoms = Atoms::new();
-        let n = atoms.add_node(Molecule::E(Element::N));
-        let r1 = atoms.add_node(r1.as_molecule());
-        let r2 = atoms.add_node(r2.as_molecule());
-        atoms.add_edge(n, r1);
-        atoms.add_edge(n, r2);
-        Self::Amine(Amine(atoms))
+        Self::Amine(Amine::new_with(r1, r2))
     }
 
     fn unwrap(&self) -> &AtomGraph {
         match self {
-            Self::Ether(a) => a.0.atoms(),
-            Self::BorinicAcid(a) => a.0.atoms(),
-            Self::Sulfide(a) => a.0.atoms(),
-            Self::Amine(a) => a.0.atoms(),
-            Self::Alkane(a) => a.chain.atoms(),
+            Self::Ether(a) => a.atoms(),
+            Self::BorinicAcid(a) => a.atoms(),
+            Self::Sulfide(a) => a.atoms(),
+            Self::Amine(a) => a.atoms(),
+            Self::Alkane(a) => a.atoms(),
         }
     }
 }
@@ -87,28 +70,28 @@ impl FunctionalGroup {
 impl AtomLike for FunctionalGroup {
     fn get_atoms(&self) -> &Atoms {
         match self {
-            FunctionalGroup::Alkane(m) => m.get_atoms(),
-            FunctionalGroup::Ether(m) => m.get_atoms(),
-            FunctionalGroup::BorinicAcid(m) => m.get_atoms(),
-            FunctionalGroup::Sulfide(m) => m.get_atoms(),
-            FunctionalGroup::Amine(m) => m.get_atoms(),
+            Self::Alkane(m) => m.get_atoms(),
+            Self::Ether(m) => m.get_atoms(),
+            Self::BorinicAcid(m) => m.get_atoms(),
+            Self::Sulfide(m) => m.get_atoms(),
+            Self::Amine(m) => m.get_atoms(),
         }
     }
 
     fn get_atoms_mut(&mut self) -> &mut Atoms {
         match self {
-            FunctionalGroup::Alkane(m) => m.get_atoms_mut(),
-            FunctionalGroup::Ether(m) => m.get_atoms_mut(),
-            FunctionalGroup::BorinicAcid(m) => m.get_atoms_mut(),
-            FunctionalGroup::Sulfide(m) => m.get_atoms_mut(),
-            FunctionalGroup::Amine(m) => m.get_atoms_mut(),
+            Self::Alkane(m) => m.get_atoms_mut(),
+            Self::Ether(m) => m.get_atoms_mut(),
+            Self::BorinicAcid(m) => m.get_atoms_mut(),
+            Self::Sulfide(m) => m.get_atoms_mut(),
+            Self::Amine(m) => m.get_atoms_mut(),
         }
     }
 
     fn flatten(&self) -> Atoms {
         match self {
             Self::Ether(a) => a.0.flatten(),
-            Self::BorinicAcid(a) => a.0.flatten(),
+            Self::BorinicAcid(a) => a.flatten(),
             Self::Sulfide(a) => a.0.flatten(),
             Self::Amine(a) => a.flatten(),
             Self::Alkane(a) => a.flatten(),

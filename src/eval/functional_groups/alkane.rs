@@ -1,15 +1,16 @@
 use std::collections::vec_deque::Iter;
-use std::collections::VecDeque;
+use std::collections::{HashMap, VecDeque};
 
 use petgraph::stable_graph::{EdgeIndex, NodeIndex};
 use petgraph::visit::IntoNeighbors;
 
-use super::atom_like::AtomLike;
-use super::atoms::Atoms;
-use super::element::Element;
-use super::functional_groups::FunctionalGroup;
-use super::molecule::Molecule;
-use super::value::Weighable;
+use crate::eval::atom_like::AtomLike;
+use crate::eval::atoms::Atoms;
+use crate::eval::element::Element;
+use crate::eval::molecule::Molecule;
+use crate::eval::value::{Valuable, Value};
+
+use super::{fg_macros, FunctionalGroup};
 
 #[derive(Debug, Clone)]
 pub enum AlkaneElement {
@@ -20,7 +21,7 @@ pub enum AlkaneElement {
 
 #[derive(Debug, Clone)]
 pub struct Alkane {
-    pub chain: Atoms,
+    chain: Atoms,
     pub current_atom: NodeIndex,
     backbone: VecDeque<NodeIndex>,
 }
@@ -186,13 +187,21 @@ impl Alkane {
     }
 }
 
+impl Default for Alkane {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl AtomLike for Alkane {
     fn get_atoms(&self) -> &Atoms {
         &self.chain
     }
+
     fn get_atoms_mut(&mut self) -> &mut Atoms {
         &mut self.chain
     }
+
     fn flatten(&self) -> Atoms {
         self.chain.flatten()
     }
@@ -206,18 +215,37 @@ impl AtomLike for Alkane {
     }
 }
 
-impl Weighable for Alkane {
-    fn atomic_numbers(&self) -> i64 {
-        self.chain
-            .atoms()
-            .neighbors(self.chain.head)
-            .map(|neighbor| {
-                self.chain
-                    .atoms()
-                    .node_weight(neighbor)
-                    .unwrap()
-                    .atomic_numbers()
-            })
-            .sum()
+impl Valuable for Alkane {
+    fn value(&self) -> Value {
+        // 2 options:
+        // - a map if and only if all functional groups are pairs
+        // - a list otherwise
+
+        // get the functional groups of all backbone atoms
+        let backbone_bonds: Vec<Vec<&Molecule>> = self
+            .backbone()
+            .map(|carbon| self.get_bonded_molecules(carbon.clone()))
+            .collect();
+        let vec: Vec<Value> = backbone_bonds.iter().map(|v| v.iter().map(|mol| {
+                let Molecule::F(fg) = mol else {panic!("inner alkanes should not have elements, got {:?}", mol)};
+                fg.value()
+            })).flatten().collect();
+
+        // if everything in the vec is a pair...
+        if vec.iter().all(|item| match item {
+            Value::Pair(_, _) => true,
+            _ => false,
+        }) {
+            // return hashmap instead
+            let mut map: HashMap<Value, Value> = HashMap::new();
+            vec.iter().for_each(|pair| {
+                let Value::Pair(k, v) = pair else {panic!("expected only pairs in vec of pairs, got non-pair {:?}", pair)};
+                map.insert(*k.clone(), *v.clone());
+            });
+            return Value::Map(map);
+        }
+        Value::List(vec)
     }
 }
+
+fg_macros::fg!(Alkane, chain);

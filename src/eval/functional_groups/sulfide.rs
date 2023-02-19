@@ -1,9 +1,4 @@
-use std::char::{from_u32, REPLACEMENT_CHARACTER};
-
-use petgraph::stable_graph::{EdgeIndex, NodeIndex};
-
 use crate::eval::{
-    alkane::{Alkane, AlkaneElement},
     atom_like::AtomLike,
     atoms::Atoms,
     element::Element,
@@ -11,7 +6,11 @@ use crate::eval::{
     value::{Valuable, Value, Weighable},
 };
 
-use super::{ether::Ether, FgElement, FunctionalGroup};
+use super::{
+    alkane::{Alkane, AlkaneElement},
+    ether::Ether,
+    fg_macros, FgElement, FunctionalGroup,
+};
 
 #[derive(Debug, Clone)]
 pub struct Sulfide(pub Atoms);
@@ -19,7 +18,7 @@ pub struct Sulfide(pub Atoms);
 impl Sulfide {
     pub fn new() -> Sulfide {
         let mut atoms = Atoms::new();
-        let s = atoms.add_node(Molecule::E(Element::S));
+        atoms.add_node(Molecule::E(Element::S));
         Sulfide(atoms)
     }
 
@@ -35,10 +34,10 @@ impl Sulfide {
 impl Valuable for Sulfide {
     fn value(&self) -> Value {
         let mut chars = Vec::new();
-        self.0
+        self
             .atoms()
-            .neighbors(self.0.head)
-            .map(|atom| self.0.atoms().node_weight(atom).unwrap())
+            .neighbors(self.head)
+            .map(|atom| self.atoms().node_weight(atom).unwrap())
             // sulfides should have either nothing, an ether, or an alkane
             // an element is a runtime error
             .for_each(|mol| {
@@ -61,7 +60,7 @@ impl Valuable for Sulfide {
                                 let Molecule::F(FunctionalGroup::Ether(e)) = m else {panic!("expected ethers on string alkane, instead got {:?}", m)};
                                 let v = e.value();
                                 let Value::Number(c) = v else {panic!("expected number from ether, got {:?}", v)};
-                                from_u32(c as u32).unwrap_or(REPLACEMENT_CHARACTER)
+                                char::from_u32(c as u32).unwrap_or(char::REPLACEMENT_CHARACTER)
                             })
                             .collect();
                         chars.append(&mut cs);
@@ -70,52 +69,13 @@ impl Valuable for Sulfide {
                         // ethers are just a single character
                         let v = e.value();
                         let Value::Number(c) = v else {panic!("expected number from ether, got {:?}", v)};
-                        chars.push(from_u32(c as u32).unwrap_or(REPLACEMENT_CHARACTER));
+                        chars.push(char::from_u32(c as u32).unwrap_or(char::REPLACEMENT_CHARACTER));
                     },
                     fg => panic!("expected nothing, ether, or alkane; got {:?}", fg)
                 }
             });
 
         Value::String(chars)
-    }
-}
-
-impl AtomLike for Sulfide {
-    fn get_atoms(&self) -> &Atoms {
-        &self.0
-    }
-
-    fn get_atoms_mut(&mut self) -> &mut Atoms {
-        &mut self.0
-    }
-
-    fn flatten(&self) -> Atoms {
-        self.0.flatten()
-    }
-
-    fn add_node(&mut self, m: Molecule) -> NodeIndex {
-        self.0.add_node(m)
-    }
-
-    fn add_edge(&mut self, m: NodeIndex, n: NodeIndex) -> EdgeIndex {
-        self.0.add_edge(m, n)
-    }
-}
-
-impl Weighable for Sulfide {
-    fn atomic_numbers(&self) -> i64 {
-        let atoms = &self.0;
-        atoms
-            .atoms()
-            .neighbors(atoms.head)
-            .map(|neighbor| {
-                atoms
-                    .atoms()
-                    .node_weight(neighbor)
-                    .unwrap()
-                    .atomic_numbers()
-            })
-            .sum()
     }
 }
 
@@ -147,3 +107,14 @@ impl From<&str> for Sulfide {
         sulfide
     }
 }
+impl From<char> for Sulfide {
+    fn from(c: char) -> Sulfide {
+        let mut sulfide = Sulfide::new();
+        let sulfur = sulfide.0.head;
+        let mol = sulfide.add_node(Molecule::F(FunctionalGroup::Ether(Ether::from(c))));
+        sulfide.add_edge(sulfur, mol);
+        sulfide
+    }
+}
+
+fg_macros::fg!(Sulfide);

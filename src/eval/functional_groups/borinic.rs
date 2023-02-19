@@ -3,56 +3,44 @@ use petgraph::stable_graph::{EdgeIndex, NodeIndex};
 use crate::eval::{
     atom_like::AtomLike,
     atoms::Atoms,
+    element::Element,
     molecule::Molecule,
     value::{Valuable, Value, Weighable},
 };
 
+use super::{fg_macros, FgElement};
+
 #[derive(Debug, Clone)]
-pub struct BorinicAcid(pub Atoms);
+pub struct BorinicAcid(Atoms);
 
-impl AtomLike for BorinicAcid {
-    fn get_atoms(&self) -> &Atoms {
-        &self.0
+impl BorinicAcid {
+    pub fn new() -> BorinicAcid {
+        let mut atoms = Atoms::new();
+        atoms.add_node(Molecule::E(Element::B));
+        atoms.add_node(Molecule::E(Element::O));
+        atoms.add_node(Molecule::E(Element::H));
+        BorinicAcid(atoms)
     }
 
-    fn get_atoms_mut(&mut self) -> &mut Atoms {
-        &mut self.0
-    }
-
-    fn flatten(&self) -> Atoms {
-        self.0.flatten()
-    }
-
-    fn add_node(&mut self, m: Molecule) -> NodeIndex {
-        self.0.add_node(m)
-    }
-
-    fn add_edge(&mut self, m: NodeIndex, n: NodeIndex) -> EdgeIndex {
-        self.0.add_edge(m, n)
-    }
-}
-
-impl Weighable for BorinicAcid {
-    fn atomic_numbers(&self) -> i64 {
-        let atoms = &self.0;
-        atoms
-            .atoms()
-            .neighbors(atoms.head)
-            .map(|neighbor| {
-                atoms
-                    .atoms()
-                    .node_weight(neighbor)
-                    .unwrap()
-                    .atomic_numbers()
-            })
-            .sum()
+    pub fn new_with(r: FgElement) -> BorinicAcid {
+        let mut atoms = Atoms::new();
+        let b = atoms.add_node(Molecule::E(Element::B));
+        let o = atoms.add_node(Molecule::E(Element::O));
+        let h = atoms.add_node(Molecule::E(Element::H));
+        let r = atoms.add_node(r.as_molecule());
+        atoms.add_edge(b, o);
+        atoms.add_edge(o, h);
+        atoms.add_edge(b, r);
+        BorinicAcid(atoms)
     }
 }
 
 impl Valuable for BorinicAcid {
     fn value(&self) -> Value {
         // true if the head has more than 1 neighbor
-        let atoms = &self.0;
+        let atoms = &self;
         Value::Boolean(atoms.atoms().neighbors(atoms.head).count() > 1)
     }
 }
+
+fg_macros::fg!(BorinicAcid);

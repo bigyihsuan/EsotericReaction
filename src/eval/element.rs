@@ -673,3 +673,7 @@ from_for_element!(u8);
 from_for_element!(u16);
 from_for_element!(u32);
 from_for_element!(u64);
+from_for_element!(i8);
+from_for_element!(i16);
+from_for_element!(i32);
+from_for_element!(i64);
