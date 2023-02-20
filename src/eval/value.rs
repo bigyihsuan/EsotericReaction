@@ -1,4 +1,9 @@
-use std::{collections::HashMap, fmt::Display, hash::Hash, ops::Add};
+use std::{
+    collections::HashMap,
+    fmt::Display,
+    hash::Hash,
+    ops::{Add, Sub},
+};
 
 #[derive(Debug, Clone)]
 pub enum Value {
@@ -99,6 +104,44 @@ impl Add for Value {
                 Value::Map(m)
             }
             (l, r) => panic!("not supported for Add: {} and {}", l, r),
+        }
+    }
+}
+impl Sub for Value {
+    type Output = Value;
+
+    fn sub(self, rhs: Self) -> Self::Output {
+        match (self, rhs) {
+            (Value::Number(l), Value::Number(r)) => Value::Number(l - r),
+            (Value::Boolean(l), Value::Boolean(r)) => Value::Boolean(l || r),
+            (Value::String(l), Value::String(r)) => {
+                let v = l;
+                Value::String(v.iter().filter(|c| r.contains(c)).map(|c| *c).collect())
+            }
+            (Value::Pair(la, lb), Value::Pair(ra, rb)) => {
+                let a = *la - *ra;
+                let b = *lb - *rb;
+                Value::Pair(Box::new(a), Box::new(b))
+            }
+            (Value::List(l), Value::List(r)) => {
+                let v = l;
+                Value::List(
+                    v.iter()
+                        .filter(|c| r.contains(c))
+                        .map(|c| c.clone())
+                        .collect(),
+                )
+            }
+            (Value::Map(l), Value::Map(r)) => {
+                let m = l;
+                Value::Map(
+                    m.iter()
+                        .filter(|(k, _)| r.contains_key(k))
+                        .map(|(k, v)| (k.clone(), v.clone()))
+                        .collect(),
+                )
+            }
+            (l, r) => panic!("not supported for Sub: {} and {}", l, r),
         }
     }
 }

@@ -6,7 +6,7 @@ pub mod fg_macros;
 pub mod sulfide;
 
 use std::fmt::Display;
-use std::ops::Add;
+use std::ops::{Add, Sub};
 
 use self::alkane::Alkane;
 use self::sulfide::Sulfide;
@@ -181,6 +181,40 @@ impl Add for FunctionalGroup {
                 FunctionalGroup::Alkane(Alkane::from(v))
             }
             (l, r) => panic!("not supported for Add: {} and {}", l, r),
+        }
+    }
+}
+impl Sub for FunctionalGroup {
+    type Output = FunctionalGroup;
+
+    fn sub(self, rhs: Self) -> Self::Output {
+        match (self, rhs) {
+            (FunctionalGroup::Ether(l), FunctionalGroup::Ether(r)) => FunctionalGroup::Ether(l + r),
+            (FunctionalGroup::BorinicAcid(l), FunctionalGroup::BorinicAcid(r)) => {
+                let l = l.value();
+                let r = r.value();
+                let v = l - r;
+                FunctionalGroup::BorinicAcid(BorinicAcid::from(v))
+            }
+            (FunctionalGroup::Sulfide(l), FunctionalGroup::Sulfide(r)) => {
+                let l = l.value();
+                let r = r.value();
+                let v = l - r;
+                FunctionalGroup::Sulfide(Sulfide::from(v))
+            }
+            (FunctionalGroup::Amine(l), FunctionalGroup::Amine(r)) => {
+                let l = l.value();
+                let r = r.value();
+                let v = l - r;
+                FunctionalGroup::Amine(Amine::from(v))
+            }
+            (FunctionalGroup::Alkane(l), FunctionalGroup::Alkane(r)) => {
+                let l = l.value();
+                let r = r.value();
+                let v = l - r;
+                FunctionalGroup::Alkane(Alkane::from(v))
+            }
+            (l, r) => panic!("not supported for Sub: {} and {}", l, r),
         }
     }
 }

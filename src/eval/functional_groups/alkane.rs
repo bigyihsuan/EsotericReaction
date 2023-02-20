@@ -1,6 +1,5 @@
 use std::collections::vec_deque::Iter;
 use std::collections::{HashMap, VecDeque};
-use std::ops::Add;
 
 use petgraph::stable_graph::{EdgeIndex, NodeIndex};
 
@@ -269,13 +268,4 @@ impl From<Value> for Alkane {
     }
 }
 
-impl Add for Alkane {
-    type Output = Alkane;
-
-    fn add(self, rhs: Self) -> Self::Output {
-        let l = self.value();
-        let r = rhs.value();
-        let v = l + r;
-        Alkane::from(v)
-    }
-}
+fg_macros::ops!(Alkane);

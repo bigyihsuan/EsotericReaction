@@ -1,5 +1,3 @@
-use std::ops::Add;
-
 use crate::eval::{
     atom_like::AtomLike, atoms::Atoms, element::Element, molecule::Molecule, traits::Valuable,
     value::Value,
@@ -143,14 +141,4 @@ impl From<Value> for Sulfide {
 
 fg_macros::fg!(Sulfide);
 
-impl Add for Sulfide {
-    type Output = Sulfide;
-
-    fn add(self, rhs: Self) -> Self::Output {
-        // TODO: instead of converting to value, act directly on the atoms?
-        let l = self.value();
-        let r = rhs.value();
-        let v = l + r;
-        Sulfide::from(v)
-    }
-}
+fg_macros::ops!(Sulfide);

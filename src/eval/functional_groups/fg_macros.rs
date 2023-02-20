@@ -67,4 +67,31 @@ macro_rules! fg {
     };
 }
 
+macro_rules! ops {
+    ($T:ty) => {
+        use std::ops::{Add, Sub};
+        impl Add for $T {
+            type Output = $T;
+
+            fn add(self, rhs: Self) -> Self::Output {
+                let l = self.value();
+                let r = rhs.value();
+                let v = l + r;
+                Self::from(v)
+            }
+        }
+        impl Sub for $T {
+            type Output = $T;
+
+            fn sub(self, rhs: Self) -> Self::Output {
+                let l = self.value();
+                let r = rhs.value();
+                let v = l - r;
+                Self::from(v)
+            }
+        }
+    };
+}
+
 pub(crate) use fg;
+pub(crate) use ops;

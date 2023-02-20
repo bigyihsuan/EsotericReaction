@@ -1,5 +1,3 @@
-use std::ops::Add;
-
 use crate::eval::{
     atom_like::AtomLike, atoms::Atoms, element::Element, molecule::Molecule, traits::Valuable,
     value::Value,
@@ -64,13 +62,4 @@ impl From<bool> for BorinicAcid {
     }
 }
 
-impl Add for BorinicAcid {
-    type Output = BorinicAcid;
-
-    fn add(self, rhs: Self) -> Self::Output {
-        let l = self.value();
-        let r = rhs.value();
-        let v = l + r;
-        BorinicAcid::from(v)
-    }
-}
+fg_macros::ops!(BorinicAcid);

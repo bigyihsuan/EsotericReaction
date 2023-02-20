@@ -1,11 +1,12 @@
-use std::ops::Add;
-
 use crate::eval::{
     atom_like::AtomLike, atoms::Atoms, element::Element, molecule::Molecule, traits::Valuable,
     value::Value,
 };
 
-use super::{fg_macros, FgElement, FunctionalGroup};
+use super::{
+    fg_macros::{self},
+    FgElement, FunctionalGroup,
+};
 
 #[derive(Debug, Clone)]
 pub struct Amine(pub Atoms);
@@ -67,13 +68,4 @@ impl From<(Value, Value)> for Amine {
     }
 }
 
-impl Add for Amine {
-    type Output = Amine;
-
-    fn add(self, rhs: Self) -> Self::Output {
-        let l = self.value();
-        let r = rhs.value();
-        let v = l + r;
-        Amine::from(v)
-    }
-}
+fg_macros::ops!(Amine);

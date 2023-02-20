@@ -1,5 +1,3 @@
-use std::ops::Add;
-
 use crate::eval::{
     atom_like::AtomLike, atoms::Atoms, element::Element, molecule::Molecule, traits::Valuable,
     value::Value,
@@ -81,13 +79,4 @@ impl_from_for_ether!(i32);
 impl_from_for_ether!(i64);
 impl_from_for_ether!(i128);
 
-impl Add for Ether {
-    type Output = Ether;
-
-    fn add(self, rhs: Self) -> Self::Output {
-        let l = self.value();
-        let r = rhs.value();
-        let v = l + r;
-        Ether::from(v)
-    }
-}
+fg_macros::ops!(Ether);

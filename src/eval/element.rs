@@ -500,18 +500,7 @@ impl Weighable for Element {
             Element::Lv => 116,
             Element::Ts => 117,
             Element::Og => 118,
-            Element::Heavy(s) => {
-                s
-                    // lowercase the string
-                    .to_lowercase()
-                    .chars()
-                    // map each char to a digit
-                    .map(|c| format!("{}", HEAVY_LETTERS.find(|d| d == c).unwrap()))
-                    .collect::<String>()
-                    // parse into an int
-                    .parse::<i64>()
-                    .unwrap()
-            }
+            Element::Heavy(s) => Element::parse_symbol(s.to_string()),
         }
     }
 }
@@ -639,28 +628,7 @@ macro_rules! from_for_element {
                     116 => Element::Lv,
                     117 => Element::Ts,
                     118 => Element::Og,
-                    n => {
-                        let n_str = n.to_string();
-                        let mut digits = n_str
-                            .chars()
-                            // get digits
-                            .map(|d| d.to_digit(10).unwrap())
-                            // map digit to letter
-                            .map(|d| {
-                                HEAVY_LETTERS
-                                    .chars()
-                                    .nth(d as usize)
-                                    .unwrap_or(char::REPLACEMENT_CHARACTER)
-                            });
-                        let heavy = digits
-                            .next()
-                            .map(|first_letter| first_letter.to_uppercase())
-                            .into_iter()
-                            .flatten()
-                            .chain(digits)
-                            .collect::<String>();
-                        Element::Heavy(heavy)
-                    }
+                    n => Element::Heavy(Element::to_symbol(n as i64)),
                 }
             }
         }
@@ -677,3 +645,55 @@ from_for_element!(i16);
 from_for_element!(i32);
 from_for_element!(i64);
 from_for_element!(i128);
+
+impl Element {
+    fn to_symbol(n: i64) -> String {
+        let n_str = n.to_string();
+        let mut n_chars = n_str.chars();
+        if n < 0 {
+            n_chars.next();
+        }
+        let mut digits = n_chars
+            // get digits
+            .map(|d| d.to_digit(10).unwrap())
+            // map digit to letter
+            .map(|d| {
+                HEAVY_LETTERS
+                    .chars()
+                    .nth(d as usize)
+                    .unwrap_or(char::REPLACEMENT_CHARACTER)
+            });
+        let mut heavy = digits
+            .next()
+            .map(|first_letter| first_letter.to_uppercase())
+            .into_iter()
+            .flatten()
+            .chain(digits)
+            .collect::<String>();
+        if n < 0 {
+            heavy = format!("-{heavy}");
+        }
+        heavy
+    }
+
+    fn parse_symbol(s: String) -> i64 {
+        let lower = s.to_lowercase();
+        let mut s_chars = lower.chars().peekable();
+        let negative = Some('-') == s_chars.peek().copied();
+        if negative {
+            s_chars.next();
+        }
+        let n = s_chars
+            // map each char to a digit
+            .map(|c| format!("{}", HEAVY_LETTERS.find(|d| d == c).unwrap()))
+            .collect::<String>()
+            // parse into an int
+            .parse::<i64>()
+            .unwrap();
+        if negative {
+            -n
+        } else {
+            n
+        }
+    }
+}

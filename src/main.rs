@@ -29,7 +29,7 @@ fn main() {
     let three = Ether::from(3);
     let ten = Ether::from(10);
     eprintln!("3={} 10={}", three.value(), ten.value());
-    let thirteen = three + ten;
+    let thirteen = three - ten;
 
     let dot_config = [Config::EdgeNoLabel];
     println!(
