@@ -18,6 +18,8 @@ Esoteric Reaction is a functional/stack-based/concatenative esoteric programming
 HS"Hello, World!" + Xn -> XnSH
 ```
 
+
+
 ### Law of Conservation of Mass
 
 All Esoteric Reaction programs must follow the Law of Conservation of Mass:
@@ -121,58 +123,63 @@ and `R'`, `R''`, `R'''`, etc., are other functional groups, or another alkane.
 
 ## Instructions
 
+### Direction Sepcifiers: Lithium and Beryllium
+
+Lithium and beryllium (`Li` and `Be`) are reserved words in Esoteric Reaction.
+They can be appended to the end of any instruction to determine which direction an instruction will operate on.
+`Li` is towards the "top"/first carbon, while `Be` is towards the "bottom"/last carbon.
+Unmarked operations default to the currently-pointed-to carbon.
+
 ### Alkane Manipulation
 
 Most instructions regarding manipulating the alkane are alkali and alkali earth metals.
 
-| Instruction | Effect                                                 | Notes                                       |
-| ----------- | ------------------------------------------------------ | ------------------------------------------- |
-| `K`         | Move alkene pointer "up"                               |                                             |
-| `Ca`        | Move alkene pointer "down"                             |                                             |
-| `Na`        | Add carbon at the "top"                                |                                             |
-| `Mg`        | Add carbon at the "bottom"                             |                                             |
-| `Li`        | Add carbon before pointer                              |                                             |
-| `Be`        | Add carbon after pointer                               |                                             |
-| `Rb`        | Remove carbon at the "top"                             | Also discards any bonded functional groups. |
-| `Sr`        | Remove carbon at the "bottom"                          | Also discards any bonded functional groups. |
-| `Cs`        | Remove carbon before pointer                           | Also discards any bonded functional groups. |
-| `Ba`        | Remove carbon after pointer                            | Also discards any bonded functional groups. |
-| `HR`        | Bond functional group `R` to the current carbon of `A` |                                             |
+| Instruction | Effect                                                                  | Notes                                             |
+| ----------- | ----------------------------------------------------------------------- | ------------------------------------------------- |
+| `HR`        | Bond functional group `R` to the current carbon.                        |                                                   |
+| `Li`        | Reserved. Operate towards the first carbon.                             |                                                   |
+| `Be`        | Reserved. Operate towards the last carbon.                              |                                                   |
+| `Na`        | Move alkene pointer in the `X` direction.                               |                                                   |
+| `Mg`        | Move alkene pointer to the end in the `X` direction.                    |                                                   |
+| `K`         | Add a carbon at the pointer in the `X` direction.                       |                                                   |
+| `Ca`        | Add a carbon at the end of the alkane in the `X` direction.             |                                                   |
+| `Rb`        | Remove the carbon at the pointer.                                       | Also discards any bonded functional groups.       |
+| `Sr`        | Remove the carbon at the end of the alkane in the `X` direction.        | Also discards any bonded functional groups.       |
+| `Cs`        | Bond the location of the pointer, 1-indexed.                            | The "top" of the alkane is considered `1`.        |
+| `Ba`        | Bond the location of the end carbon in the `X` direction of the alkane. | Calling with `Be` bonds the length of the alkane. |
+| `Fr`        | Enter the bonded alkane.                                                |                                                   |
+| `Ra`        | Exit the current alkane.                                                |                                                   |
 
 ### Unary Alkane Operations
 
 Operations on the alkane are highly dependent on both arguments being the same type.
 However, these operations are independent of that, and are mostly noble gases.
-Any instances of `X` can be `Li` or `Be`, for placing the result "above" or "below" the current carbon.
-All functional groups bonded to the current carbon are moved with the carbon.
-
-Unmarked operaions default to the carbon "below" the current one.
 
 | Instruction | Effect                                                | Notes                                                                                  |
 | ----------- | ----------------------------------------------------- | -------------------------------------------------------------------------------------- |
-| `HeX`       | Duplicate the current carbon.                         |                                                                                        |
-| `NeX`       | Swap the current carbon.                              | `X` determines which carbon to swap with. NOP if there is no carbon in that direction. |
-| `ArX`       | Rotate surrounding carbons.                           | `X` determines which way to rotate carbons.                                            |
+| `He`        | Duplicate the current carbon.                         | Also duplicates bonded functional groups.                                              |
+| `Ne`        | Swap the current carbon.                              | `X` determines which carbon to swap with. NOP if there is no carbon in that direction. |
+| `Ar`        | Rotate surrounding carbons.                           | `X` determines which way to rotate carbons.                                            |
 | `Kr`        | Print the values of the groups bonded to this carbon. | No trailing newline.                                                                   |
 | `Xn`        | Print the values of the groups bonded to this carbon. | With trailing newline. Each group is separated by newlines.                            |
-| `RdX`       |                                                       |                                                                                        |
-| `OgX`       |                                                       |                                                                                        |
+| `Rd`        | Take 1 character from STDIN.                          | `X` determines which direction to insert the input.                                    |
+| `Og`        | Take everything from STDIN.                           | `X` determines which direction to insert the input.                                    |
 
 ### Binary Operations
 
 Binary operations on the alkane are highly dependent on the types of the two arguments.
-Like with unary alkane operations, any `X` can be replaced with `Li` and `Be`
-to change which carbon is targeted for the second argument.
+Like with unary alkane operations, any `X` can be replaced with `Li` and `Be` to change which carbon is targeted for the second argument.
+See the [type chart](#binary-operations-type-charts) below to determine what operations are possible for a given type.
 
-| Instruction | Effect   | Notes                                                                                                                 |
-| ----------- | -------- | --------------------------------------------------------------------------------------------------------------------- |
-| `Al`        | Add      |                                                                                                                       |
-| `Si`        | Subtract |                                                                                                                       |
-| `Mn`        | Multiply |                                                                                                                       |
-| `Db`        | Divide   |                                                                                                                       |
-| `Mo`        | Modulo   |                                                                                                                       |
-| `In`        | Index    | Current functional group must be String, Pair, List, or Map. Other functional group must be the same type as the key. |
-| `Pd`        | Append   | Current functional group must be String, Pair, or List.                                                               |
+| Instruction | Effect   | Notes |
+| ----------- | -------- | ----- |
+| `Al`        | Add      |       |
+| `Si`        | Subtract |       |
+| `Mn`        | Multiply |       |
+| `Db`        | Divide   |       |
+| `Mo`        | Modulo   |       |
+| `In`        | Index    |       |
+| `Pd`        | Append   |       |
 
 #### Binary Operations Type Charts
 
