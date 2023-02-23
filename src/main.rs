@@ -11,6 +11,8 @@ use std::{
 
 use clap::{ArgGroup, Parser};
 
+use crate::lex::Lexer;
+
 #[derive(Debug, Parser)]
 #[command(name = "EsotericReaction")]
 #[command(author = "bigyhsuan")]
@@ -60,5 +62,9 @@ fn main() {
             s
         }
     };
-    println!("{}", source);
+
+    let mut lexer = Lexer::new(source);
+    let tokens = lexer.all_tokens();
+
+    tokens.iter().for_each(|tok| println!("{}", tok))
 }

@@ -1,5 +1,7 @@
+use std::fmt::Display;
+
 #[derive(Debug)]
-pub enum Token {
+pub enum Type {
     Comment(String),
     // symbols
     Plus,
@@ -24,4 +26,39 @@ pub enum Token {
     Element(String),
 }
 
-impl Token {}
+#[derive(Debug)]
+pub struct Token {
+    pub token: Type,
+    pub loc: Location,
+}
+
+impl Display for Token {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_fmt(format_args!("{{{:?},{}}}", self.token, self.loc))
+    }
+}
+
+#[derive(Debug)]
+pub struct Location {
+    pub start: Indexes, // (inclusive, exclusive)
+    pub end: Indexes,   // (inclusive, exclusive)
+}
+
+impl Display for Location {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_fmt(format_args!("{}-{}", self.start, self.end))
+    }
+}
+
+type Idx = usize;
+type Line = usize;
+type Col = usize;
+
+#[derive(Debug)]
+pub struct Indexes(pub Idx, pub Line, pub Col);
+
+impl Display for Indexes {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_fmt(format_args!("({},{}:{})", self.0, self.1, self.2))
+    }
+}
