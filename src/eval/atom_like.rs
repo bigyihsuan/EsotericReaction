@@ -8,5 +8,4 @@ pub trait AtomLike {
     fn flatten(&self) -> Atoms;
     fn add_node(&mut self, m: Molecule) -> NodeIndex;
     fn add_edge(&mut self, m: NodeIndex, n: NodeIndex) -> EdgeIndex;
-    // fn atomic_weight(&self) -> i64;
 }

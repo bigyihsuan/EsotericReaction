@@ -18,8 +18,6 @@ Esoteric Reaction is a functional/stack-based/concatenative esoteric programming
 HS"Hello, World!" + Xn -> XnSH
 ```
 
-
-
 ### Law of Conservation of Mass
 
 All Esoteric Reaction programs must follow the Law of Conservation of Mass:
@@ -120,6 +118,19 @@ and `R'`, `R''`, `R'''`, etc., are other functional groups, or another alkane.
 | Pair    | A 2-tuple of any two types, including lists, maps, and tuples.             | `HNR'R''`        | Tertiary Amine | `R'` is the "key", `R''` is the "value".                                                                       |
 | List    | A heterogeneous list of any type.                                          | `HC_(n)H_(2n+1)` | Alkane         | Bonds a new alkane with `n` carbons, for a list.                                                               |
 | Map     | A heterogenous list of pairs.                                              | `HC_(n)H_(2n+1)` | Alkane         | Bonds a new alkane with `n` carbons, for a map.                                                                |
+
+### Literals
+
+As syntactic sugar, each type has the following syntactic sugar, used in place of their formula:
+
+| Type    | Formula          | Example              | Notes                                                               |
+| ------- | ---------------- | -------------------- | ------------------------------------------------------------------- |
+| Integer | `HOR'`           | `H^123`              | Matches regex `-?[0-9]+`                                            |
+| Boolean | `HB(OH)R'`       | `HTr`                | Either `Tr`ue or `Fa`lse                                            |
+| String  | `HSR'`           | `H"chars"`           | Any character within double quotes. Escape double quotes with `\"`. |
+| Pair    | `HNR'R''`        | `H<"abc",123>`       |                                                                     |
+| List    | `HC_(n)H_(2n+1)` | `H[e,e,e,e,...]`     | Trailing comma optional                                             |
+| Map     | `HC_(n)H_(2n+1)` | `H{k:v,k:v,k:v,...}` | Trailing comma optional                                             |
 
 ## Instructions
 

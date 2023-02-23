@@ -1,16 +1,23 @@
 #[derive(Debug)]
 pub enum Token {
-    Comment,
+    Comment(String),
     // symbols
     Plus,
     Underscore,
     LParen,
     RParen,
+    LBracket,
+    RBracket,
+    LBrace,
+    RBrace,
+    LAngle,
+    RAngle,
     Colon,
     Arrow,
+    Comma,
     // literals
-    String(String),
     Number(String),
+    String(String),
     // elements
     Light,
     Heat,
