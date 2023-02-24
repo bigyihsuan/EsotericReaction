@@ -3,6 +3,9 @@ use std::fmt::Display;
 #[derive(Debug)]
 pub enum Type {
     Comment(String),
+    // whitespace
+    Space,
+    Newline,
     // symbols
     Plus,
     Underscore,
@@ -29,7 +32,7 @@ pub enum Type {
 #[derive(Debug)]
 pub struct Token {
     pub token: Type,
-    pub loc: Location,
+    pub loc: Span,
 }
 
 impl Display for Token {
@@ -39,12 +42,12 @@ impl Display for Token {
 }
 
 #[derive(Debug)]
-pub struct Location {
+pub struct Span {
     pub start: Indexes, // (inclusive, exclusive)
     pub end: Indexes,   // (inclusive, exclusive)
 }
 
-impl Display for Location {
+impl Display for Span {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.write_fmt(format_args!("{}-{}", self.start, self.end))
     }
