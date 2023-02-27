@@ -1,12 +1,11 @@
-mod args;
 mod eval;
 mod lex;
 mod par;
 mod util;
 
-use args::parse_args;
-use lex::lex::Lexer;
-use par::par::Parser;
+use lex::lexer::Lexer;
+use par::parser::Parser;
+use util::args::parse_args;
 
 fn main() {
     // let code = r"C_3H_8+5O_2 -> 3CO_2+4H_2O".to_string();
@@ -25,19 +24,22 @@ fn main() {
     // eprintln!("3={} 10={}", three.value(), ten.value());
     // let thirteen = three - ten;
 
-    // let dot_config = [Config::EdgeNoLabel];
-    // println!(
-    //     "{:?}",
-    //     dot::Dot::with_config(&thirteen.flatten().atoms(), &dot_config)
-    // );
-
     let source = parse_args();
+
+    let source = "H^123 -> H\n".to_string();
+    eprintln!("{source}\n");
 
     let mut lexer = Lexer::new(source);
     let tokens = lexer.all_tokens();
 
-    tokens.iter().for_each(|tok| println!("{}", tok));
+    tokens.iter().for_each(|tok| eprintln!("{tok}"));
+    eprintln!("\n");
 
     let mut parser = Parser::new(tokens);
-    println!("{parser:?}")
+    // println!("{parser:?}")
+    let result = parser.parse();
+    match result {
+        Ok(result) => println!("{result:?}"),
+        Err(error) => eprintln!("{error:?}"),
+    }
 }

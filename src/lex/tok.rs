@@ -1,7 +1,8 @@
 use std::fmt::Display;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum Type {
+    None,
     Comment(String),
     // whitespace
     Space,
@@ -20,6 +21,7 @@ pub enum Type {
     Colon,
     Arrow,
     Comma,
+    Caret,
     // literals
     Number(String),
     String(String),
@@ -29,7 +31,13 @@ pub enum Type {
     Element(String),
 }
 
-#[derive(Debug)]
+impl Default for Type {
+    fn default() -> Self {
+        Self::None
+    }
+}
+
+#[derive(Debug, Clone, Default)]
 pub struct Token {
     pub token: Type,
     pub loc: Span,
@@ -41,7 +49,7 @@ impl Display for Token {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Default)]
 pub struct Span {
     pub start: Indexes, // (inclusive, exclusive)
     pub end: Indexes,   // (inclusive, exclusive)
@@ -57,7 +65,7 @@ type Idx = usize;
 type Line = usize;
 type Col = usize;
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Default)]
 pub struct Indexes(pub Idx, pub Line, pub Col);
 
 impl Display for Indexes {

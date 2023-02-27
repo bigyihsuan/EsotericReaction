@@ -54,7 +54,13 @@ impl Lexer {
         let mut tokens = Vec::new();
         while self.idx < self.code.len() {
             if let Ok(t) = self.next_token() {
-                tokens.push(t);
+                match t.token {
+                    Type::Space => continue,
+                    Type::Comment(_) => continue,
+                    _ => {
+                        tokens.push(t);
+                    }
+                }
             }
         }
         tokens
@@ -69,22 +75,27 @@ impl Lexer {
                 self.col = 0;
                 ok_token!(Type::Newline, idx, line, col)
             }
-            '+' => ok_token!(Type::Plus, self.idx, self.line, self.col),
-            '_' => ok_token!(Type::Underscore, self.idx, self.line, self.col),
-            '(' => ok_token!(Type::LParen, self.idx, self.line, self.col),
-            ')' => ok_token!(Type::RParen, self.idx, self.line, self.col),
-            '[' => ok_token!(Type::LBracket, self.idx, self.line, self.col),
-            ']' => ok_token!(Type::RBracket, self.idx, self.line, self.col),
-            '{' => ok_token!(Type::LBrace, self.idx, self.line, self.col),
-            '}' => ok_token!(Type::RBrace, self.idx, self.line, self.col),
-            '<' => ok_token!(Type::LAngle, self.idx, self.line, self.col),
-            '>' => ok_token!(Type::RAngle, self.idx, self.line, self.col),
-            ':' => ok_token!(Type::Colon, self.idx, self.line, self.col),
-            ',' => ok_token!(Type::Comma, self.idx, self.line, self.col),
+            '+' => ok_token!(self, Type::Plus),
+            '_' => ok_token!(self, Type::Underscore),
+            '(' => ok_token!(self, Type::LParen),
+            ')' => ok_token!(self, Type::RParen),
+            '[' => ok_token!(self, Type::LBracket),
+            ']' => ok_token!(self, Type::RBracket),
+            '{' => ok_token!(self, Type::LBrace),
+            '}' => ok_token!(self, Type::RBrace),
+            '<' => ok_token!(self, Type::LAngle),
+            '>' => ok_token!(self, Type::RAngle),
+            ':' => ok_token!(self, Type::Colon),
+            ',' => ok_token!(self, Type::Comma),
+            '^' => ok_token!(self, Type::Caret),
             '-' => {
                 start_vars!(self, idx, line, col);
                 self.read_char()?;
-                if self.ch != '>' {
+                if self.ch.is_digit(10) {
+                    self.put_back()?; // digit
+                    self.put_back()?; // minus
+                    self.number()
+                } else if self.ch != '>' {
                     Err(format!("expected `>` after `-`, got {}", self.ch))
                 } else {
                     ok_token!(Type::Arrow, idx, line, col)
@@ -95,9 +106,12 @@ impl Lexer {
             // element
             'A'..='Z' => self.element(),
             // string literal
-            '\"' => self.string_literal(),
+            '\"' => self.string(),
             // number literal
-            '^' => self.number(),
+            c if c.is_digit(10) => {
+                self.put_back()?;
+                self.number()
+            }
             c => Err(format!("unknown character: {c}")),
         }
     }
@@ -126,25 +140,20 @@ impl Lexer {
     fn number(&mut self) -> Result<Token, String> {
         let mut chars = String::new();
         start_vars!(self, idx, line, col);
-        // ignore leading caret
-        self.read_char()?;
         // begin digits
         if self.ch == '-' {
             chars.push(self.ch);
         }
+        self.read_char()?;
         while self.ch.is_digit(10) {
+            chars.push(self.ch);
             self.read_char()?;
-            if self.ch.is_digit(10) {
-                chars.push(self.ch);
-            } else {
-                self.put_back()?;
-                break;
-            }
         }
+        self.put_back()?;
         ok_token!(self, Type::Number(chars), idx, line, col)
     }
 
-    fn string_literal(&mut self) -> Result<Token, String> {
+    fn string(&mut self) -> Result<Token, String> {
         let mut chars = String::new();
         start_vars!(self, idx, line, col);
         self.read_char()?;
@@ -191,6 +200,15 @@ macro_rules! ok_token {
             token: $token_type,
             loc: Span {
                 start: Indexes($start_idx, $start_line, $start_col),
+                end: Indexes($self.idx + 1, $self.line, $self.col),
+            },
+        })
+    };
+    ($self:ident, $token_type:expr) => {
+        Ok(Token {
+            token: $token_type,
+            loc: Span {
+                start: Indexes($self.idx, $self.line, $self.col),
                 end: Indexes($self.idx + 1, $self.line, $self.col),
             },
         })

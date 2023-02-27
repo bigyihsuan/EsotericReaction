@@ -126,7 +126,6 @@ As syntactic sugar, each type has the following syntactic sugar, used in place o
 | Type    | Formula          | Example              | Notes                                                               |
 | ------- | ---------------- | -------------------- | ------------------------------------------------------------------- |
 | Integer | `HOR'`           | `H^123`              | Matches regex `-?[0-9]+`                                            |
-| Integer | `HOR'`           | `HUbt...`            | `Ubt...` being an atomic number encoded as a atomic symbol          |
 | Boolean | `HB(OH)R'`       | `HTr`                | Either `Tr`ue or `Fa`lse                                            |
 | String  | `HSR'`           | `H"chars"`           | Any character within double quotes. Escape double quotes with `\"`. |
 | Pair    | `HNR'R''`        | `H<"abc",123>`       |                                                                     |

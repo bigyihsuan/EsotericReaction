@@ -1,0 +1,29 @@
+# a program is multiple equations
+program ::= equation*
+# an equation is a lhs and rhs separated by an arrow; each side can be multiple terms
+equation ::= compound ('+' compound)* '->' rightCompound ('+' rightCompound)* '\n'
+# a compund is some elementals with leading coefficient
+compound ::= coeff? elementals
+rightCompound ::= coeff? rightElementals
+# elementals are a bunch of elementals
+elementals ::= elemental+
+rightElementals ::= rightElemental+
+# an elemental is a periodic table element, or a literal
+elemental ::= periodic | literal
+rightElemental ::= periodic
+# a periodic is an element with optional subscript
+periodic ::= element subscript?
+literal ::= element('H') (numberLiteral | booleanLiteral | stringLiteral | pairLiteral | listLiteral | mapLiteral)
+numberLiteral ::= '^' number
+booleanLiteral ::= 'Tr' | 'Fa'
+stringLiteral ::= '"' any chars except for double quote, except when escaped '"'
+pairLiteral ::= '<' literal ',' literal '>'
+listLiteral ::= '[' (literal (',' literal)?)? ']'
+mapLiteral ::= '{' (literal ':' literal (',' literal ':' literal)?)? '}'
+element ::= 'H', 'He', ... 'Uuo', 'Uun', ...
+
+coeff ::= POSITIVE_NUMBER
+subscript ::= '_' POSITIVE_NUMBER
+
+number ::= '-'? POSITIVE_NUMBER
+POSITIVE_NUMBER ::= matches "[0-9]+"

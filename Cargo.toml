@@ -7,4 +7,6 @@ edition = "2021"
 
 [dependencies]
 clap = { version = "4.1.6", features = ["derive"] }
+itertools = "0.10.5"
 petgraph = ">=0.6.3"
+stdext = "0.3.1"
