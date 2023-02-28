@@ -1,0 +1,6 @@
+; decimal number literal
+H^123 -> H
+; single-element number literal
+HOUbt -> HOUbt
+; multiple-element number literal
+HOUGa -> HOUGa ; 92 + 31 = 123

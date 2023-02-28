@@ -25,7 +25,7 @@ fn main() {
     // let thirteen = three - ten;
 
     let source = parse_args();
-    eprintln!("{source}\n");
+    eprintln!("```\n{source}```\n");
 
     let mut lexer = Lexer::new(source);
     let tokens = lexer.all_tokens();
@@ -37,7 +37,9 @@ fn main() {
     // println!("{parser:?}")
     let result = parser.parse();
     match result {
-        Ok(result) => println!("{result:?}"),
-        Err(error) => eprintln!("{error:?}"),
+        Ok(result) => {
+            dbg!(result);
+        }
+        Err(error) => eprintln!("{error}"),
     }
 }

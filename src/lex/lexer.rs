@@ -54,16 +54,27 @@ impl Lexer {
         let mut tokens = Vec::new();
         while self.idx < self.code.len() {
             if let Ok(t) = self.next_token() {
-                match t.token {
-                    Type::Space => continue,
-                    Type::Comment(_) => continue,
-                    _ => {
-                        tokens.push(t);
-                    }
-                }
+                tokens.push(t);
             }
         }
-        tokens
+        let tokens: Vec<Token> = tokens
+            .iter()
+            // no comments or spaces
+            .filter(|tok| match tok.token {
+                Type::Comment(_) | Type::Space => false,
+                _ => true,
+            })
+            // remove duplicate newlines from removing comments
+            .dedup_by(|l, r| l.token == r.token)
+            .map(|tok| tok.clone())
+            .collect();
+        // remove "empty" lines (newlines at the start of the token list)
+        let first = tokens.first();
+        if first.is_some() && first.unwrap().clone().token == Type::Newline {
+            tokens.split_at(1).1.to_vec()
+        } else {
+            tokens
+        }
     }
     pub fn next_token(&mut self) -> Result<Token, String> {
         self.read_char()?;
@@ -125,6 +136,7 @@ impl Lexer {
             end_col = self.col;
             self.read_char()?;
         }
+        self.put_back()?;
         ok_token!(
             self,
             Type::Comment(comment),
@@ -241,6 +253,7 @@ macro_rules! start_vars {
     };
 }
 
+use itertools::Itertools;
 use ok_token;
 use start_vars;
 

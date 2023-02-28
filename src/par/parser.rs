@@ -1,6 +1,9 @@
 use itertools::{PeekingNext, PutBack};
 
-use crate::lex::tok::{Token, Type};
+use crate::{
+    lex::tok::{Token, Type},
+    par::parse_tree::ElementalNumberLiteral,
+};
 
 use super::{
     parse_error::{parse_error, ParseError, Reason},
@@ -177,6 +180,9 @@ impl Parser {
             return Ok(elementals);
         }
         loop {
+            if let Type::Newline = self.peek_token()?.clone().token {
+                return Ok(elementals);
+            }
             let elemental = self.elemental(side.clone())?;
             if let Some(e) = elemental {
                 elementals.push(e);
@@ -380,8 +386,12 @@ impl Parser {
         dbg!(stdext::function_name!());
         // hydrogen oxygen elements
         let oxygen = self.next_token()?;
-        let elements = self.compound(EquationSide::Left)?;
-        todo!()
+        let vals = Box::new(self.compound(EquationSide::Left)?);
+        Ok(ParseTree::ElementalNumberLiteral(ElementalNumberLiteral {
+            hydrogen,
+            oxygen,
+            vals,
+        }))
     }
 
     fn boolean_literal(&mut self, hydrogen: Token) -> Result<ParseTree, ParseError> {

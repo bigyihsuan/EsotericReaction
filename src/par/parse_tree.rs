@@ -12,6 +12,7 @@ pub enum ParseTree {
     Subscript(Subscript),
     // literals
     NumberLiteral(Literal),
+    ElementalNumberLiteral(ElementalNumberLiteral),
     DecimalNumberLiteral(DecimalNumberLiteral),
     StringLiteral(Literal),
     BooleanLiteral(Literal),
@@ -62,6 +63,13 @@ pub struct Subscript {
 pub struct Literal {
     pub hydrogen: Token,
     pub val: Token,
+}
+
+#[derive(Debug)]
+pub struct ElementalNumberLiteral {
+    pub hydrogen: Token,
+    pub oxygen: Token,
+    pub vals: Box<ParseTree>,
 }
 
 #[derive(Debug)]
