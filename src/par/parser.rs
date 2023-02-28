@@ -1,16 +1,10 @@
 use itertools::{PeekingNext, PutBack};
 
-use crate::{
-    lex::tok::{Token, Type},
-    par::parse_tree::ElementalNumberLiteral,
-};
+use crate::lex::tok::{Token, Type};
 
 use super::{
     parse_error::{parse_error, ParseError, Reason},
-    parse_tree::{
-        Compound, DecimalNumber, DecimalNumberLiteral, Element, Equation, Literal, ParseTree,
-        Periodic, Program, Subscript,
-    },
+    parse_tree::ParseTree,
 };
 
 #[derive(Debug, Clone)]
@@ -90,7 +84,7 @@ impl Parser {
         while self.peek_token().is_ok() {
             equations.push(self.equation()?);
         }
-        Ok(ParseTree::Program(Program { equations }))
+        Ok(ParseTree::Program { equations })
     }
 
     pub fn equation(&mut self) -> Result<ParseTree, ParseError> {
@@ -129,12 +123,12 @@ impl Parser {
                 let newline = self.next_token()?;
                 if let Type::Newline = newline.token {
                     dbg!("finished equation:", &lhs, &arrow, &rhs, &newline);
-                    Ok(ParseTree::Equation(Equation {
+                    Ok(ParseTree::Equation {
                         lhs,
                         arrow,
                         rhs,
                         newline,
-                    }))
+                    })
                 } else {
                     parse_error!(
                         Reason::ExpectedDifferentToken {
@@ -161,7 +155,7 @@ impl Parser {
         dbg!(stdext::function_name!(), &side);
         let coeff = self.coeff()?;
         let elementals = self.elementals(side)?;
-        Ok(ParseTree::Compound(Compound { coeff, elementals }))
+        Ok(ParseTree::Compound { coeff, elementals })
     }
 
     pub fn elementals(&mut self, side: EquationSide) -> Result<Vec<ParseTree>, ParseError> {
@@ -273,14 +267,14 @@ impl Parser {
         let element = Box::new(element);
         let subscript = self.subscript()?;
         let subscript = Box::new(subscript);
-        Ok(ParseTree::Periodic(Periodic { element, subscript }))
+        Ok(ParseTree::Periodic { element, subscript })
     }
 
     pub fn element(&mut self) -> Result<ParseTree, ParseError> {
         dbg!(stdext::function_name!());
         let val = self.next_token()?;
         if let Type::Element(_) = val.token {
-            Ok(ParseTree::Element(Element { val }))
+            Ok(ParseTree::Element { val })
         } else {
             parse_error!(
                 Reason::ExpectedDifferentToken {
@@ -309,7 +303,7 @@ impl Parser {
             let underscore = self.next_token()?;
             let val = self.next_token()?;
             if let Type::Number(_) = val.token {
-                Ok(Some(ParseTree::Subscript(Subscript { underscore, val })))
+                Ok(Some(ParseTree::Subscript { underscore, val }))
             } else {
                 parse_error!(
                     Reason::ExpectedDifferentToken {
@@ -346,7 +340,7 @@ impl Parser {
         dbg!(stdext::function_name!());
         let token = val.clone();
         if let Type::Number(_) = token.token {
-            Ok(ParseTree::DecimalNumber(DecimalNumber { val }))
+            Ok(ParseTree::DecimalNumber { val })
         } else {
             parse_error!(
                 Reason::ExpectedDifferentToken {
@@ -366,11 +360,11 @@ impl Parser {
         if let Type::Number(_) = val.token {
             let num = self.decimal_number(val)?;
             let num = Box::new(num);
-            Ok(ParseTree::DecimalNumberLiteral(DecimalNumberLiteral {
+            Ok(ParseTree::DecimalNumberLiteral {
                 hydrogen,
                 caret,
                 val: num,
-            }))
+            })
         } else {
             parse_error!(
                 Reason::ExpectedDifferentToken {
@@ -387,11 +381,11 @@ impl Parser {
         // hydrogen oxygen elements
         let oxygen = self.next_token()?;
         let vals = Box::new(self.compound(EquationSide::Left)?);
-        Ok(ParseTree::ElementalNumberLiteral(ElementalNumberLiteral {
+        Ok(ParseTree::ElementalNumberLiteral {
             hydrogen,
             oxygen,
             vals,
-        }))
+        })
     }
 
     fn boolean_literal(&mut self, hydrogen: Token) -> Result<ParseTree, ParseError> {
@@ -401,7 +395,7 @@ impl Parser {
         let val = token.clone();
         if let Type::Element(element) = token.token {
             if element == String::from("Tr") || element == String::from("Fa") {
-                Ok(ParseTree::BooleanLiteral(Literal { hydrogen, val }))
+                Ok(ParseTree::BooleanLiteral { hydrogen, val })
             } else {
                 parse_error!(
                     Reason::ExpectedDifferentToken {
