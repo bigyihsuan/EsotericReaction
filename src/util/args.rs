@@ -33,6 +33,9 @@ pub fn parse_args() -> String {
             s
         }
     };
-    let source = source + "\n";
-    source
+    if source.ends_with("\n") {
+        source
+    } else {
+        source + "\n"
+    }
 }

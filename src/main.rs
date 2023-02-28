@@ -25,8 +25,6 @@ fn main() {
     // let thirteen = three - ten;
 
     let source = parse_args();
-
-    let source = "H^123 -> H\n".to_string();
     eprintln!("{source}\n");
 
     let mut lexer = Lexer::new(source);

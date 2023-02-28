@@ -66,6 +66,7 @@ impl Parser {
         dbg!(stdext::function_name!());
         if let Some(peeked) = self.tokens.peeking_next(|_token| true) {
             self.tokens.put_back(peeked.clone());
+            dbg!(&peeked);
             Ok(peeked)
         } else {
             parse_error!(
@@ -124,6 +125,7 @@ impl Parser {
                 }
                 let newline = self.next_token()?;
                 if let Type::Newline = newline.token {
+                    dbg!("finished equation:", &lhs, &arrow, &rhs, &newline);
                     Ok(ParseTree::Equation(Equation {
                         lhs,
                         arrow,
