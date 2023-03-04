@@ -3,9 +3,11 @@ mod lex;
 mod par;
 mod util;
 
-use lex::lexer::Lexer;
-use par::parser::Parser;
+use logos::Logos;
+// use par::parser::Parser;
 use util::args::parse_args;
+
+use crate::lex::tok::Token;
 
 fn main() {
     // let code = r"C_3H_8+5O_2 -> 3CO_2+4H_2O".to_string();
@@ -27,19 +29,21 @@ fn main() {
     let source = parse_args();
     eprintln!("```\n{source}```\n");
 
-    let mut lexer = Lexer::new(source);
-    let tokens = lexer.all_tokens();
+    // let mut lexer = Lexer::new(source);
+    // let tokens = lexer.all_tokens();
 
-    tokens.iter().for_each(|tok| eprintln!("{tok}"));
-    eprintln!("\n");
-
-    let mut parser = Parser::new(tokens);
-    // println!("{parser:?}")
-    let result = parser.parse();
-    match result {
-        Ok(result) => {
-            dbg!(result);
-        }
-        Err(error) => eprintln!("{error}"),
+    let tokens: Vec<_> = Token::lexer(&source).spanned().collect();
+    for (tok, span) in tokens {
+        println!("{} {:?}", tok, span);
     }
+
+    // let mut parser = Parser::new(tokens);
+    // // println!("{parser:?}")
+    // let result = parser.parse();
+    // match result {
+    //     Ok(result) => {
+    //         dbg!(result);
+    //     }
+    //     Err(error) => eprintln!("{error}"),
+    // }
 }

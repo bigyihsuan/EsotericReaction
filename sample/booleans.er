@@ -1,8 +1,8 @@
 ; sugared True
-HTr -> HTr
+HTr -> HTr.
 ; sugared False
-HFa -> HFa
+HFa -> HFa.
 ; elemental True
-HB(OH)H -> HB(OH)H
+HB(OH)H -> HB(OH)H.
 ; elemental False
-HB(OH)H -> HB(OH)H
+HB(OH)H -> HB(OH)H.

@@ -1,5 +1,3 @@
-use crate::lex::tok::{Indexes, Span};
-
 #[derive(Debug)]
 pub struct Lexer {
     code: Vec<char>,
@@ -50,6 +48,7 @@ impl Lexer {
             Err("could not put back char".to_string())
         }
     }
+    /*
     pub fn all_tokens(&mut self) -> Vec<Token> {
         let mut tokens = Vec::new();
         while self.idx < self.code.len() {
@@ -204,6 +203,7 @@ impl Lexer {
         self.put_back()?;
         ok_token!(self, Type::Element(lexeme), idx, line, col)
     }
+    */
 }
 
 macro_rules! ok_token {
@@ -256,5 +256,3 @@ macro_rules! start_vars {
 use itertools::Itertools;
 use ok_token;
 use start_vars;
-
-use super::tok::{Token, Type};

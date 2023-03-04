@@ -1,7 +1,7 @@
 # a program is multiple equations
 program ::= equation*
 # an equation is a lhs and rhs separated by an arrow; each side can be multiple terms
-equation ::= compound ('+' compound)* '->' rightCompound ('+' rightCompound)* '\n'
+equation ::= compound ('+' compound)* '->' rightCompound ('+' rightCompound)* '.'
 # a compund is some elementals with leading coefficient
 compound ::= coeff? elemental+
 rightCompound ::= coeff? rightElemental+

@@ -1,6 +1,6 @@
 use std::fmt::Display;
 
-use crate::lex::tok::{Token, Type};
+use crate::lex::tok::Token;
 
 #[derive(Debug)]
 pub struct ParseError {
@@ -26,7 +26,7 @@ impl Display for ParseError {
 #[derive(Debug)]
 pub enum Reason {
     OutOfTokens,
-    ExpectedDifferentToken { want: Vec<Type>, got: Type },
+    ExpectedDifferentToken { want: Vec<Token>, got: Token },
     NeedAtLeastOneElemental,
 }
 

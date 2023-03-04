@@ -1,81 +1,59 @@
 use std::fmt::Display;
 
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub enum Type {
-    None,
-    Comment(String),
-    // whitespace
-    Space,
-    Newline,
+use logos::Logos;
+use snailquote::unescape;
+
+#[derive(Logos, Debug, Clone, PartialEq, Eq)]
+pub enum Token {
+    // ignore whitespace
+    #[error]
+    #[regex(r"[ \t\r\n\f]+", logos::skip)]
+    Error,
+    #[regex(r";[^\n]*\n?", logos::skip)]
+    Comment,
     // symbols
+    #[token("+")]
     Plus,
+    #[token("_")]
     Underscore,
+    #[token("(")]
     LParen,
+    #[token(")")]
     RParen,
+    #[token("[")]
     LBracket,
+    #[token("]")]
     RBracket,
+    #[token("{")]
     LBrace,
+    #[token("}")]
     RBrace,
+    #[token("<")]
     LAngle,
+    #[token(">")]
     RAngle,
+    #[token(":")]
     Colon,
+    #[token("->")]
     Arrow,
+    #[token(",")]
     Comma,
+    #[token(".")]
+    Period,
+    #[token("^")]
     Caret,
     // literals
-    Number(String),
+    #[regex("-?[0-9]+", |lex| parse_int::parse::<i64>(lex.slice()))]
+    Number(i64),
+    #[regex("\"(?:[^\"]|\\\\\")*\"", |lex| unescape(lex.slice()))]
     String(String),
     // elements
-    Light,
-    Heat,
+    #[regex("[A-Z][a-z]*", |lex| lex.slice().parse(), priority=2)]
     Element(String),
-}
-
-impl Display for Type {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.write_fmt(format_args!("{:?}", self))
-    }
-}
-
-impl Default for Type {
-    fn default() -> Self {
-        Self::None
-    }
-}
-
-#[derive(Debug, Clone, Default)]
-pub struct Token {
-    pub token: Type,
-    pub loc: Span,
 }
 
 impl Display for Token {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.write_fmt(format_args!("{{{:?},{}}}", self.token, self.loc))
-    }
-}
-
-#[derive(Debug, Clone, Default)]
-pub struct Span {
-    pub start: Indexes, // (inclusive, exclusive)
-    pub end: Indexes,   // (inclusive, exclusive)
-}
-
-impl Display for Span {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.write_fmt(format_args!("{}-{}", self.start, self.end))
-    }
-}
-
-type Idx = usize;
-type Line = usize;
-type Col = usize;
-
-#[derive(Debug, Clone, Default)]
-pub struct Indexes(pub Idx, pub Line, pub Col);
-
-impl Display for Indexes {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.write_fmt(format_args!("({},{}:{})", self.0, self.1, self.2))
+        f.write_fmt(format_args!("{:?}", self))
     }
 }

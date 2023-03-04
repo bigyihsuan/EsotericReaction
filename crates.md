@@ -1,0 +1,10 @@
+- https://david-delassus.medium.com/writing-a-simple-lisp-interpreter-in-rust-91dd32ea4d8f
+- https://github.com/linkdd/lispers
+- lexing: https://github.com/maciejhirsz/logos
+- string escaping: https://github.com/euank/snailquote
+- str to int: https://gitlab.com/dns2utf8/parse_int
+- string interning: https://github.com/robbepop/string-interner
+- lr(1) parser generator: https://github.com/lalrpop/lalrpop
+- parsing expression grammar: https://github.com/kevinmehall/rust-peg
+- line, cols: https://github.com/TheBerkin/line-col-rs
+- readline: https://github.com/kkawakam/rustyline
