@@ -8,10 +8,15 @@
             "type": "lldb",
             "request": "launch",
             "name": "Debug Rust",
-            "program": "${workspaceFolder}/target/debug/esoteric_reaction.exe",
+            "cargo": {
+                "args": [
+                    "run",
+                    "--"
+                ]
+            },
             "args": [
                 "-f",
-                "sample/hello-world.er"
+                "sample/booleans.er"
             ],
         }
     ]

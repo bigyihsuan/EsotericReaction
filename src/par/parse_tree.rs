@@ -15,6 +15,9 @@ pub enum ParseTree {
     },
     Compound {
         coeff: Option<Token>,
+        elementals: Box<ParseTree>,
+    },
+    Elementals {
         elementals: Vec<ParseTree>,
     },
     Periodic {
@@ -29,40 +32,57 @@ pub enum ParseTree {
         val: Token,
     },
     // literals
-    NumberLiteral {
-        hydrogen: Token,
-        val: Token,
-    },
     ElementalNumberLiteral {
         hydrogen: Token,
         oxygen: Token,
         vals: Box<ParseTree>,
     },
-    DecimalNumberLiteral {
+    SugaredNumberLiteral {
         hydrogen: Token,
         caret: Token,
         val: Box<ParseTree>,
     },
-    StringLiteral {
+    ElementalBooleanLiteral {
+        hydrogen: Token,
+        boron: Token,
+        hydroxide: Box<ParseTree>,
+        val: Box<ParseTree>,
+    },
+    SugaredBooleanLiteral {
         hydrogen: Token,
         val: Token,
     },
-    BooleanLiteral {
+    ElementalStringLiteral {
+        hydrogen: Token,
+        sulfur: Token,
+        val: Token,
+    },
+    SugaredStringLiteral {
         hydrogen: Token,
         val: Token,
     },
-    PairLiteral {
+    ElementalPairLiteral {
         left: Box<ParseTree>,
         right: Box<ParseTree>,
     },
-    ListLiteral {
+    SugaredPairLiteral {
+        left: Box<ParseTree>,
+        right: Box<ParseTree>,
+    },
+    ElementalListLiteral {
         items: Vec<ParseTree>,
     },
-    MapLiteral {
+    SugaredListLiteral {
+        items: Vec<ParseTree>,
+    },
+    ElementalMapLiteral {
+        items: Vec<(ParseTree, ParseTree)>,
+    },
+    SugaredMapLiteral {
         items: Vec<(ParseTree, ParseTree)>,
     },
     // misc
-    DecimalNumber {
+    Number {
         val: Token,
     },
 }

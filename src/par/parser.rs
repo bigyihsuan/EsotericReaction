@@ -33,7 +33,7 @@ impl Parser {
         let next = self.tokens.next();
         if let Some(token) = next {
             self.used_tokens.push(token.clone());
-            dbg!(&token);
+            // dbg!(&token);
             Ok(token)
         } else {
             parse_error!(
@@ -63,7 +63,7 @@ impl Parser {
         dbg!(stdext::function_name!());
         if let Some(peeked) = self.tokens.peeking_next(|_token| true) {
             self.tokens.put_back(peeked.clone());
-            dbg!(&peeked);
+            // dbg!(&peeked);
             Ok(peeked)
         } else {
             parse_error!(
@@ -154,14 +154,19 @@ impl Parser {
     pub fn compound(&mut self, side: EquationSide) -> Result<ParseTree, ParseError> {
         dbg!(stdext::function_name!(), &side);
         let coeff = self.coeff()?;
-        let elementals = self.elementals(side)?;
+        let elementals = self.elementals(side, false)?;
+        let elementals = Box::new(elementals);
         Ok(ParseTree::Compound { coeff, elementals })
     }
 
-    pub fn elementals(&mut self, side: EquationSide) -> Result<Vec<ParseTree>, ParseError> {
+    pub fn elementals(
+        &mut self,
+        side: EquationSide,
+        nested: bool,
+    ) -> Result<ParseTree, ParseError> {
         dbg!(stdext::function_name!(), &side);
         let mut elementals = Vec::new();
-        let first = self.elemental(side.clone())?;
+        let first = self.elemental(side.clone(), nested)?;
         if let Some(first) = first {
             elementals.push(first);
         } else {
@@ -170,25 +175,40 @@ impl Parser {
                 self.used_tokens.last().unwrap_or(&Token::default()).clone()
             );
         }
-        if let Type::Newline = self.peek_token()?.clone().token {
-            return Ok(elementals);
+
+        let peeked = self.peek_token()?.clone().token;
+        if peeked == Type::Newline || peeked == Type::RParen {
+            return Ok(ParseTree::Elementals { elementals });
         }
+
         loop {
             if let Type::Newline = self.peek_token()?.clone().token {
-                return Ok(elementals);
+                return Ok(ParseTree::Elementals { elementals });
             }
-            let elemental = self.elemental(side.clone())?;
+            let elemental = self.elemental(side.clone(), nested)?;
             if let Some(e) = elemental {
                 elementals.push(e);
             } else if let None = elemental {
                 break;
             }
         }
-        Ok(elementals)
+        Ok(ParseTree::Elementals { elementals })
     }
 
-    pub fn elemental(&mut self, side: EquationSide) -> Result<Option<ParseTree>, ParseError> {
+    pub fn elemental(
+        &mut self,
+        side: EquationSide,
+        nested: bool,
+    ) -> Result<Option<ParseTree>, ParseError> {
         dbg!(stdext::function_name!(), &side);
+        if let Type::LParen = self.peek_token()?.clone().token {
+            // nested
+            let _lparen = self.next_token()?; // discard lparen
+            let nested_elementals = self.elementals(side.clone(), true)?;
+            let _rparen = self.next_token()?; // discard rparen
+            return Ok(Some(nested_elementals));
+        }
+
         // limit the right hand side to only periodics
         if let EquationSide::Right = side {
             let periodic = self.periodic()?;
@@ -197,7 +217,7 @@ impl Parser {
         let token = self.peek_token()?;
         match token.token {
             Type::Element(symbol) => {
-                if symbol.as_str() == "H" {
+                if symbol.as_str() == "H" && !nested {
                     let hydrogen = self.next_token()?;
                     let literal = self.literal(hydrogen)?;
                     Ok(Some(literal))
@@ -207,57 +227,6 @@ impl Parser {
                 }
             }
             _ => Ok(None),
-        }
-    }
-
-    fn literal(&mut self, hydrogen: Token) -> Result<ParseTree, ParseError> {
-        dbg!(stdext::function_name!());
-        let token = self.peek_token()?;
-        let t = token.clone();
-        match token.token {
-            Type::Caret => self.decimal_number_literal(hydrogen),
-            Type::String(_) => self.string_literal(hydrogen),
-            Type::LAngle => self.pair_literal(hydrogen),
-            Type::LBracket => self.list_literal(hydrogen),
-            Type::LBrace => self.map_literal(hydrogen),
-            Type::Element(symbol) => match symbol.as_str() {
-                "Tr" | "Fa" => self.boolean_literal(hydrogen),
-                "O" => self.elemental_number_literal(hydrogen),
-                "S" => self.elemental_string_literal(hydrogen),
-                "N" => self.elemental_pair_literal(hydrogen),
-                "C" => self.elemental_list_map_literal(hydrogen),
-                _ => parse_error!(
-                    Reason::ExpectedDifferentToken {
-                        want: vec![
-                            Type::Element(String::from("Tr")),
-                            Type::Element(String::from("Fa")),
-                            Type::Element(String::from("O")),
-                            Type::Element(String::from("S")),
-                            Type::Element(String::from("N")),
-                            Type::Element(String::from("C")),
-                        ],
-                        got: t.clone().token
-                    },
-                    t
-                ),
-            },
-            _ => {
-                return parse_error!(
-                    Reason::ExpectedDifferentToken {
-                        want: vec![
-                            Type::Element(String::from("Tr")),
-                            Type::Element(String::from("Fa")),
-                            Type::Caret,
-                            Type::String(String::new()),
-                            Type::LAngle,
-                            Type::LBracket,
-                            Type::LBrace,
-                        ],
-                        got: token.clone().token
-                    },
-                    token
-                )
-            }
         }
     }
 
@@ -296,6 +265,7 @@ impl Parser {
             Ok(None)
         }
     }
+
     pub fn subscript(&mut self) -> Result<Option<ParseTree>, ParseError> {
         dbg!(stdext::function_name!());
         let underscore = self.peek_token()?;
@@ -318,29 +288,11 @@ impl Parser {
         }
     }
 
-    pub fn number_literal(&mut self, hydrogen: Token) -> Result<ParseTree, ParseError> {
-        dbg!(stdext::function_name!());
-        let token = self.peek_token()?;
-        if let Type::Caret = token.token {
-            self.decimal_number_literal(hydrogen)
-        } else if let Type::Element(_) = token.token {
-            todo!()
-        } else {
-            parse_error!(
-                Reason::ExpectedDifferentToken {
-                    want: vec![Type::Caret, Type::Element("".to_string())],
-                    got: token.clone().token
-                },
-                token
-            )
-        }
-    }
-
-    fn decimal_number(&mut self, val: Token) -> Result<ParseTree, ParseError> {
+    fn number(&mut self, val: Token) -> Result<ParseTree, ParseError> {
         dbg!(stdext::function_name!());
         let token = val.clone();
         if let Type::Number(_) = token.token {
-            Ok(ParseTree::DecimalNumber { val })
+            Ok(ParseTree::Number { val })
         } else {
             parse_error!(
                 Reason::ExpectedDifferentToken {
@@ -352,15 +304,68 @@ impl Parser {
         }
     }
 
-    pub fn decimal_number_literal(&mut self, hydrogen: Token) -> Result<ParseTree, ParseError> {
+    fn literal(&mut self, hydrogen: Token) -> Result<ParseTree, ParseError> {
+        dbg!(stdext::function_name!());
+        let token = self.peek_token()?;
+        let t = token.clone();
+        match token.token {
+            Type::Caret => self.sugared_number_literal(hydrogen),
+            Type::String(_) => self.sugared_string_literal(hydrogen),
+            Type::LAngle => self.sugared_pair_literal(hydrogen),
+            Type::LBracket => self.sugared_list_literal(hydrogen),
+            Type::LBrace => self.sugared_map_literal(hydrogen),
+            Type::Element(symbol) => match symbol.as_str() {
+                "Tr" | "Fa" => self.sugared_boolean_literal(hydrogen),
+                "B" => self.elemental_boolean_literal(hydrogen),
+                "O" => self.elemental_number_literal(hydrogen),
+                "S" => self.elemental_string_literal(hydrogen),
+                "N" => self.elemental_pair_literal(hydrogen),
+                "C" => self.elemental_list_map_literal(hydrogen),
+                _ => parse_error!(
+                    Reason::ExpectedDifferentToken {
+                        want: vec![
+                            Type::Element(String::from("Tr")),
+                            Type::Element(String::from("Fa")),
+                            Type::Element(String::from("O")),
+                            Type::Element(String::from("B")),
+                            Type::Element(String::from("S")),
+                            Type::Element(String::from("N")),
+                            Type::Element(String::from("C")),
+                        ],
+                        got: t.clone().token
+                    },
+                    t
+                ),
+            },
+            _ => {
+                return parse_error!(
+                    Reason::ExpectedDifferentToken {
+                        want: vec![
+                            Type::Element(String::from("Tr")),
+                            Type::Element(String::from("Fa")),
+                            Type::Caret,
+                            Type::String(String::new()),
+                            Type::LAngle,
+                            Type::LBracket,
+                            Type::LBrace,
+                        ],
+                        got: token.clone().token
+                    },
+                    token
+                )
+            }
+        }
+    }
+
+    pub fn sugared_number_literal(&mut self, hydrogen: Token) -> Result<ParseTree, ParseError> {
         dbg!(stdext::function_name!());
         // hydrogen caret number
         let caret = self.next_token()?;
         let val = self.next_token()?;
         if let Type::Number(_) = val.token {
-            let num = self.decimal_number(val)?;
+            let num = self.number(val)?;
             let num = Box::new(num);
-            Ok(ParseTree::DecimalNumberLiteral {
+            Ok(ParseTree::SugaredNumberLiteral {
                 hydrogen,
                 caret,
                 val: num,
@@ -388,14 +393,14 @@ impl Parser {
         })
     }
 
-    fn boolean_literal(&mut self, hydrogen: Token) -> Result<ParseTree, ParseError> {
+    fn sugared_boolean_literal(&mut self, hydrogen: Token) -> Result<ParseTree, ParseError> {
         dbg!(stdext::function_name!());
         // HTr or HFa
         let token = self.next_token()?;
         let val = token.clone();
         if let Type::Element(element) = token.token {
             if element == String::from("Tr") || element == String::from("Fa") {
-                Ok(ParseTree::BooleanLiteral { hydrogen, val })
+                Ok(ParseTree::SugaredBooleanLiteral { hydrogen, val })
             } else {
                 parse_error!(
                     Reason::ExpectedDifferentToken {
@@ -422,7 +427,19 @@ impl Parser {
         }
     }
 
-    fn string_literal(&mut self, hydrogen: Token) -> Result<ParseTree, ParseError> {
+    fn elemental_boolean_literal(&mut self, hydrogen: Token) -> Result<ParseTree, ParseError> {
+        let boron = self.next_token()?;
+        let hydroxide = Box::new(self.elementals(EquationSide::Left, true)?);
+        let val = Box::new(self.elementals(EquationSide::Left, true)?);
+        Ok(ParseTree::ElementalBooleanLiteral {
+            hydrogen,
+            boron,
+            hydroxide,
+            val,
+        })
+    }
+
+    fn sugared_string_literal(&mut self, hydrogen: Token) -> Result<ParseTree, ParseError> {
         dbg!(stdext::function_name!());
         todo!()
     }
@@ -432,7 +449,7 @@ impl Parser {
         todo!()
     }
 
-    fn pair_literal(&mut self, hydrogen: Token) -> Result<ParseTree, ParseError> {
+    fn sugared_pair_literal(&mut self, hydrogen: Token) -> Result<ParseTree, ParseError> {
         dbg!(stdext::function_name!());
         todo!()
     }
@@ -447,12 +464,12 @@ impl Parser {
         todo!()
     }
 
-    fn list_literal(&mut self, hydrogen: Token) -> Result<ParseTree, ParseError> {
+    fn sugared_list_literal(&mut self, hydrogen: Token) -> Result<ParseTree, ParseError> {
         dbg!(stdext::function_name!());
         todo!()
     }
 
-    fn map_literal(&mut self, hydrogen: Token) -> Result<ParseTree, ParseError> {
+    fn sugared_map_literal(&mut self, hydrogen: Token) -> Result<ParseTree, ParseError> {
         dbg!(stdext::function_name!());
         todo!()
     }
