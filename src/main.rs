@@ -1,13 +1,23 @@
+mod common;
 mod eval;
-mod lex;
+mod grammar;
+mod intern;
+mod lexer;
 mod par;
+mod prelude;
 mod util;
 
 use logos::Logos;
+use prelude::SyntaxError;
+use string_interner::{symbol::SymbolUsize, DefaultBackend, StringInterner};
 // use par::parser::Parser;
 use util::args::parse_args;
 
-use crate::lex::tok::Token;
+use crate::{
+    intern::{Backend, Symbol},
+    lexer::TokenStream,
+    par::parser::parse,
+};
 
 fn main() {
     // let code = r"C_3H_8+5O_2 -> 3CO_2+4H_2O".to_string();
@@ -26,24 +36,22 @@ fn main() {
     // eprintln!("3={} 10={}", three.value(), ten.value());
     // let thirteen = three - ten;
 
-    let source = parse_args();
-    eprintln!("```\n{source}```\n");
+    let (file, source) = parse_args();
+    eprintln!("file: {file:?}\n```\n{source}```\n");
 
-    // let mut lexer = Lexer::new(source);
-    // let tokens = lexer.all_tokens();
+    type S = SymbolUsize;
+    type B = DefaultBackend<S>;
 
-    let tokens: Vec<_> = Token::lexer(&source).spanned().collect();
-    for (tok, span) in tokens {
-        println!("{} {:?}", tok, span);
+    let mut interner: StringInterner<B> = StringInterner::new();
+
+    let program = parse(file, &source, &mut interner);
+    println!();
+    match program {
+        Ok(program) => {
+            for equation in program.0 {
+                println!("{equation:?}")
+            }
+        }
+        Err(error) => eprintln!("{error}"),
     }
-
-    // let mut parser = Parser::new(tokens);
-    // // println!("{parser:?}")
-    // let result = parser.parse();
-    // match result {
-    //     Ok(result) => {
-    //         dbg!(result);
-    //     }
-    //     Err(error) => eprintln!("{error}"),
-    // }
 }

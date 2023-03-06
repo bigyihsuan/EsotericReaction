@@ -1,88 +1,96 @@
-use crate::lex::tok::Token;
+use std::fmt::Debug;
 
-#[derive(Debug)]
-pub enum ParseTree {
-    None,
-    // symbolics
-    Program {
-        equations: Vec<ParseTree>,
-    },
-    Equation {
-        lhs: Vec<ParseTree>,
-        arrow: Token,
-        rhs: Vec<ParseTree>,
-        newline: Token,
-    },
-    Compound {
-        coeff: Option<Token>,
-        elementals: Box<ParseTree>,
-    },
-    Elementals {
-        elementals: Vec<ParseTree>,
-    },
-    Periodic {
-        element: Box<ParseTree>,
-        subscript: Box<Option<ParseTree>>,
-    },
-    Element {
-        val: Token,
-    },
-    Subscript {
-        underscore: Token,
-        val: Token,
-    },
-    // literals
-    ElementalNumberLiteral {
-        hydrogen: Token,
-        oxygen: Token,
-        vals: Box<ParseTree>,
-    },
-    SugaredNumberLiteral {
-        hydrogen: Token,
-        caret: Token,
-        val: Box<ParseTree>,
-    },
-    ElementalBooleanLiteral {
-        hydrogen: Token,
-        boron: Token,
-        hydroxide: Box<ParseTree>,
-        val: Box<ParseTree>,
-    },
-    SugaredBooleanLiteral {
-        hydrogen: Token,
-        val: Token,
-    },
-    ElementalStringLiteral {
-        hydrogen: Token,
-        sulfur: Token,
-        val: Token,
-    },
-    SugaredStringLiteral {
-        hydrogen: Token,
-        val: Token,
-    },
-    ElementalPairLiteral {
-        left: Box<ParseTree>,
-        right: Box<ParseTree>,
-    },
-    SugaredPairLiteral {
-        left: Box<ParseTree>,
-        right: Box<ParseTree>,
-    },
-    ElementalListLiteral {
-        items: Vec<ParseTree>,
-    },
-    SugaredListLiteral {
-        items: Vec<ParseTree>,
-    },
-    ElementalMapLiteral {
-        items: Vec<(ParseTree, ParseTree)>,
-    },
-    SugaredMapLiteral {
-        items: Vec<(ParseTree, ParseTree)>,
-    },
-    // misc
+use crate::intern::Symbol;
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct Program<S: Symbol>(pub Vec<Equation<S>>);
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct Equation<S: Symbol> {
+    pub lhs: Reagent<S>,
+    pub rhs: Reagent<S>,
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct Reagent<S: Symbol>(pub Vec<Term<S>>);
+
+#[derive(Clone, PartialEq)]
+pub struct Term<S: Symbol> {
+    pub coeff: Option<Number>,
+    pub mol: Vec<Molecule<S>>,
+}
+
+impl<S: Symbol + Debug> Debug for Term<S> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        if let Some(n) = &self.coeff {
+            f.debug_struct("Term")
+                .field("coeff", n)
+                .field("mol", &self.mol)
+                .finish()
+        } else {
+            f.debug_struct("Term").field("mol", &self.mol).finish()
+        }
+    }
+}
+
+#[derive(Clone, PartialEq)]
+pub struct Molecule<S: Symbol> {
+    pub mol: MoleculeContents<S>,
+    pub sub: Option<Number>,
+}
+
+impl<S: Symbol + Debug> Debug for Molecule<S> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        if let Some(n) = &self.sub {
+            f.debug_struct("Molecule")
+                .field("mol", &self.mol)
+                .field("sub", n)
+                .finish()
+        } else {
+            f.debug_struct("Molecule").field("mol", &self.mol).finish()
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub enum MoleculeContents<S: Symbol> {
+    Literal(Literal<S>),
+    Nested(Box<Molecule<S>>),
+    Element(Element<S>),
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub enum Literal<S: Symbol> {
     Number {
-        val: Token,
+        hydrogen: Element<S>,
+        // c: caret
+        n: Number,
+    },
+    Boolean {
+        hydrogen: Element<S>,
+        b: Element<S>,
+    },
+    String {
+        hydrogen: Element<S>,
+        sulfur: Element<S>,
+        s: String,
+    },
+    Pair {
+        hydrogen: Element<S>,
+        p: Box<(Literal<S>, Literal<S>)>,
+    },
+    List {
+        hydrogen: Element<S>,
+        l: Vec<Literal<S>>,
+    },
+    Map {
+        hydrogen: Element<S>,
+        m: Vec<(Literal<S>, Literal<S>)>,
     },
 }
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct Element<S: Symbol>(pub S);
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct Number(pub i64);

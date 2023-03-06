@@ -7,6 +7,8 @@ Esoteric Reaction is a functional/stack-based/concatenative esoteric programming
 * Practice programming in Rust.
 * Write an esolang that looks like chemical equations.
 
+The front-end is loosely based on <https://david-delassus.medium.com/writing-a-simple-lisp-interpreter-in-rust-91dd32ea4d8f>.
+
 ## Programs
 
 ### Quick Examples

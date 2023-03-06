@@ -1,29 +1,18 @@
-# a program is multiple equations
-program ::= equation*
-# an equation is a lhs and rhs separated by an arrow; each side can be multiple terms
-equation ::= compound ('+' compound)* '->' rightCompound ('+' rightCompound)* '.'
-# a compund is some elementals with leading coefficient
-compound ::= coeff? elemental+
-rightCompound ::= coeff? rightElemental+
-# elementals are a bunch of elementals
-elementals ::= elemental+
-rightElementals ::= rightElemental+
-# an elemental is a periodic table element, or a literal
-elemental ::= periodic | literal | '(' elementals ')'
-rightElemental ::= periodic | '(' rightElementals ')'
-# a periodic is an element with optional subscript
-periodic ::= element subscript?
-literal ::= element('H') (numberLiteral | booleanLiteral | stringLiteral | pairLiteral | listLiteral | mapLiteral)
-numberLiteral ::= '^' number
+program  ::= equation*
+equation ::= reagent '->' reagent '.'
+reagent  ::= term ('+' term)*
+term     ::= NUMBER? molecule+
+molecule ::= molContents ('_' NUMBER)?
+molContents ::= '(' molecule ')' | ELEMENT | literal
+literal  ::= ELEMENT['H'] (numberLiteral | booleanLiteral | stringLiteral | pairLiteral | listLiteral | mapLiteral)
+numberLiteral  ::= '^' NUMBER
 booleanLiteral ::= 'Tr' | 'Fa'
-stringLiteral ::= '"' any chars except for double quote, except when escaped '"'
-pairLiteral ::= '<' literal ',' literal '>'
-listLiteral ::= '[' (literal (',' literal)?)? ']'
-mapLiteral ::= '{' (literal ':' literal (',' literal ':' literal)?)? '}'
-element ::= 'H', 'He', ... 'Uuo', 'Uun', ...
+stringLiteral  ::= '"' any chars except for double quote, except when escaped '"'
+pairLiteral    ::= '<' literal ',' literal '>'
+listLiteral    ::= '[' (literal (',' literal)?)? ']'
+mapLiteral     ::= '{' (literal ':' literal (',' literal ':' literal)?)? '}'
 
-coeff ::= POSITIVE_NUMBER
-subscript ::= '_' POSITIVE_NUMBER
+comment ::= ';' text '\n'
 
-number ::= '-'? POSITIVE_NUMBER
-POSITIVE_NUMBER ::= matches "[0-9]+"
+NUMBER ::= "'-'?[0-9]+"
+ELEMENT ::= "[A-Z][a-z]*"

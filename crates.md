@@ -4,6 +4,7 @@
 - string escaping: https://github.com/euank/snailquote
 - str to int: https://gitlab.com/dns2utf8/parse_int
 - string interning: https://github.com/robbepop/string-interner
+- parser combinator: https://github.com/rust-bakery/nom
 - lr(1) parser generator: https://github.com/lalrpop/lalrpop
 - parsing expression grammar: https://github.com/kevinmehall/rust-peg
 - line, cols: https://github.com/TheBerkin/line-col-rs

@@ -18,24 +18,27 @@ struct Args {
     code: Option<String>,
 }
 
-pub fn parse_args() -> String {
+pub fn parse_args() -> (Option<std::path::PathBuf>, String) {
     let args = Args::parse();
-    let source = match (args.file, args.code) {
-        (None, Some(code)) => code,
-        (Some(file), None) => fs::read_to_string(file)
-            .unwrap_or_else(|err| panic!("could not read from stdin: {}", err)),
+    let (file, source) = match (args.file, args.code) {
+        (None, Some(code)) => (None, code),
+        (Some(file), None) => (
+            Some(file.clone()),
+            fs::read_to_string(file)
+                .unwrap_or_else(|err| panic!("could not read from stdin: {}", err)),
+        ),
         (Some(_), Some(_)) => panic!("only 1 of `--file` or `--code` is allowed"),
         (None, None) => {
             let mut s = String::new();
             io::stdin()
                 .read_to_string(&mut s)
                 .unwrap_or_else(|err| panic!("could not read from stdin: {}", err));
-            s
+            (None, s)
         }
     };
     if source.ends_with("\n") {
-        source
+        (file, source)
     } else {
-        source + "\n"
+        (file, source + "\n")
     }
 }
